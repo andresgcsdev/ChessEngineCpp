@@ -18,7 +18,7 @@ void Board::setMatrix(std::array<std::array<Piece, 8>, 8> newMatrix)
     matrix = newMatrix;
 }
 
-Piece Board::getPiece(Coord c)
+Piece Board::getPiece(Coord c) const
 {
     if (isValidCoord(c))
     {
@@ -34,4 +34,18 @@ void Board::setPiece(Coord c, Piece p)
     {
         matrix[c.row][c.col] = p;
     }
+}
+
+Coord Board::getCoordinates(Piece p) const
+{
+    for(int i = 0; i < 8; i++)
+    {
+        for(int j = 0; j < 8; j++)
+        {
+            if(getPiece(Coord{i, j}) == p)
+                return Coord{i, j};
+        }
+    }
+
+    return Coord{8, 8};
 }

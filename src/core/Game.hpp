@@ -1,3 +1,4 @@
+#pragma once
 #include <array>
 #include <stack>
 #include "Board.hpp"
@@ -9,6 +10,17 @@ public:
     // Sets board and game state
     Game();
 
+    // Returns a copy of the board.
+    Board getBoard();
+
+    // Returns a copy of the turn color.
+    Color getTurn();
+
+    // Invert the turn;
+    void changeTurn();
+
+    // Validates and makes the move, returning true if the move was done and false if the move was illegal and couldn't be done.
+    // Also saves the last board state in the history.
     bool makeMove(Coord from, Coord to);
 
     // Returns an array of all possible moves the piece can make from the given position.

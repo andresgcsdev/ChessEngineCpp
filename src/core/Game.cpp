@@ -8,46 +8,61 @@ Game::Game()
 {
     gameState.turn = Color::WHITE;
     gameState.enPassant = Coord{8, 8};
-    blackKing = Coord{7, 4};
-    whiteKing = Coord{0, 4};
+    blackKing = Coord{0, 4};
+    whiteKing = Coord{7, 4};
 
     std::array<std::array<Piece, 8>, 8> matrix;
 
-    // Row 7 (Black back rank)
-    matrix[7][0] = Piece{PieceType::ROOK, Color::BLACK, '1'};
-    matrix[7][1] = Piece{PieceType::KNIGHT, Color::BLACK, '1'};
-    matrix[7][2] = Piece{PieceType::BISHOP, Color::BLACK, '1'};
-    matrix[7][3] = Piece{PieceType::QUEEN, Color::BLACK, '0'};
-    matrix[7][4] = Piece{PieceType::KING, Color::BLACK, '0'};
-    matrix[7][5] = Piece{PieceType::BISHOP, Color::BLACK, '2'};
-    matrix[7][6] = Piece{PieceType::KNIGHT, Color::BLACK, '2'};
-    matrix[7][7] = Piece{PieceType::ROOK, Color::BLACK, '2'};
-
-    // Row 6 (Black pawns)
-    for (int col = 0; col < 8; col++)
-    {
-        matrix[6][col] = Piece{PieceType::PAWN, Color::BLACK, static_cast<char>('1' + col)};
-    }
-
-    // Rows 5-2 (Empty - defaults are already BLANK)
+    // Row 0 (White back rank)
+    matrix[7][0] = Piece{PieceType::ROOK, Color::WHITE, '1'};
+    matrix[7][1] = Piece{PieceType::KNIGHT, Color::WHITE, '1'};
+    matrix[7][2] = Piece{PieceType::BISHOP, Color::WHITE, '1'};
+    matrix[7][3] = Piece{PieceType::QUEEN, Color::WHITE, '0'};
+    matrix[7][4] = Piece{PieceType::KING, Color::WHITE, '0'};
+    matrix[7][5] = Piece{PieceType::BISHOP, Color::WHITE, '2'};
+    matrix[7][6] = Piece{PieceType::KNIGHT, Color::WHITE, '2'};
+    matrix[7][7] = Piece{PieceType::ROOK, Color::WHITE, '2'};
 
     // Row 1 (White pawns)
     for (int col = 0; col < 8; col++)
     {
-        matrix[1][col] = Piece{PieceType::PAWN, Color::WHITE, static_cast<char>('1' + col)};
+        matrix[6][col] = Piece{PieceType::PAWN, Color::WHITE, static_cast<char>('1' + col)};
     }
 
-    // Row 0 (White back rank)
-    matrix[0][0] = Piece{PieceType::ROOK, Color::WHITE, '1'};
-    matrix[0][1] = Piece{PieceType::KNIGHT, Color::WHITE, '1'};
-    matrix[0][2] = Piece{PieceType::BISHOP, Color::WHITE, '1'};
-    matrix[0][3] = Piece{PieceType::QUEEN, Color::WHITE, '0'};
-    matrix[0][4] = Piece{PieceType::KING, Color::WHITE, '0'};
-    matrix[0][5] = Piece{PieceType::BISHOP, Color::WHITE, '2'};
-    matrix[0][6] = Piece{PieceType::KNIGHT, Color::WHITE, '2'};
-    matrix[0][7] = Piece{PieceType::ROOK, Color::WHITE, '2'};
+    // Row 7 (Black back rank)
+    matrix[0][0] = Piece{PieceType::ROOK, Color::BLACK, '1'};
+    matrix[0][1] = Piece{PieceType::KNIGHT, Color::BLACK, '1'};
+    matrix[0][2] = Piece{PieceType::BISHOP, Color::BLACK, '1'};
+    matrix[0][3] = Piece{PieceType::QUEEN, Color::BLACK, '0'};
+    matrix[0][4] = Piece{PieceType::KING, Color::BLACK, '0'};
+    matrix[0][5] = Piece{PieceType::BISHOP, Color::BLACK, '2'};
+    matrix[0][6] = Piece{PieceType::KNIGHT, Color::BLACK, '2'};
+    matrix[0][7] = Piece{PieceType::ROOK, Color::BLACK, '2'};
+
+    // Row 6 (Black pawns)
+    for (int col = 0; col < 8; col++)
+    {
+        matrix[1][col] = Piece{PieceType::PAWN, Color::BLACK, static_cast<char>('1' + col)};
+    }
+
+    // Rows 5-2 (Empty - defaults are already BLANK)
 
     board.setMatrix(matrix);
+}
+
+Board Game::getBoard()
+{
+    return board;
+}
+
+Color Game::getTurn()
+{
+    return gameState.turn;
+}
+
+void Game::changeTurn()
+{
+    gameState.turn = gameState.turn == Color::BLACK ? Color::WHITE : Color::BLACK;
 }
 
 std::array<Coord, 27> Game::pawnMoves(Coord p)
@@ -64,7 +79,7 @@ std::array<Coord, 27> Game::pawnMoves(Coord p)
 
     int moves[4][2] = {{1, 0}, {2, 0}, {1, 1}, {1, -1}};
     ;
-    if (pawn.c == Color::BLACK)
+    if (pawn.c == Color::WHITE)
     {
         for (int i = 0; i < 4; i++)
         {
@@ -105,7 +120,7 @@ std::array<Coord, 27> Game::pawnMoves(Coord p)
             // Move 2 to the front
             else if (moves[i][0] == 2 || moves[i][0] == -2)
             {
-                if (pawn.c == Color::WHITE &&
+                if (pawn.c == Color::BLACK &&
                     board.getPiece(currentMove).t == PieceType::BLANK &&
                     board.getPiece(Coord{p.row + 1, p.col}).t == PieceType::BLANK &&
                     p.row == 1)
@@ -113,7 +128,7 @@ std::array<Coord, 27> Game::pawnMoves(Coord p)
                     arr[k] = currentMove;
                     k++;
                 }
-                if (pawn.c == Color::BLACK &&
+                if (pawn.c == Color::WHITE &&
                     board.getPiece(currentMove).t == PieceType::BLANK &&
                     board.getPiece(Coord{p.row - 1, p.col}).t == PieceType::BLANK &&
                     p.row == 6)
@@ -364,7 +379,7 @@ std::array<Coord, 27> Game::kingMoves(Coord p)
 
 bool Game::isControlledBy(Coord sq, Color attacker)
 {
-    // 1. Check for Knights
+    // Check for Knights
     int knightMoves[8][2] = {{-2, 1}, {-2, -1}, {2, 1}, {2, -1}, {1, -2}, {1, 2}, {-1, -2}, {-1, 2}};
     for (auto &m : knightMoves)
     {
@@ -377,7 +392,7 @@ bool Game::isControlledBy(Coord sq, Color attacker)
         }
     }
 
-    // 2. Check for Sliders (Rooks, Bishops, Queens)
+    // Check for Sliders (Rooks, Bishops, Queens)
     int directions[8][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
     for (int i = 0; i < 8; i++)
     {
@@ -409,7 +424,7 @@ bool Game::isControlledBy(Coord sq, Color attacker)
         }
     }
 
-    // 3. Check for Pawns
+    // Check for Pawns
     // If we are looking for a WHITE attacker, the pawn must be BELOW the square (row - 1)
     // If we are looking for a BLACK attacker, the pawn must be ABOVE the square (row + 1)
     int pawnRowDiff = (attacker == Color::WHITE) ? -1 : 1;
@@ -562,6 +577,10 @@ std::array<Coord, 27> Game::possibleMoves(Coord piece)
 
     Piece p = board.getPiece(piece);
 
+    if(p.c != gameState.turn)
+        return arr;
+
+    // Finding possible moves without checking for validity
     switch (p.t)
     {
     case PieceType::PAWN:
@@ -598,18 +617,17 @@ std::array<Coord, 27> Game::possibleMoves(Coord piece)
         possible[i] = Coord{8, 8};
 
     int k = 0;
+    // Making sure the obtained moves don't result in check on self king
     for (int i = 0; i < 27; i++)
     {
         if (arr[i] == Coord{8, 8})
             break;
 
-        move(piece, arr[i]);
-        if (!isKingInCheck(p.c))
+        if (!testForCheck(piece, arr[i]))
         {
             possible[k] = arr[i];
             k++;
         }
-        undo();
     }
 
     return possible;
@@ -634,16 +652,20 @@ bool Game::hasMoves(Color c)
 
 bool Game::testForCheck(Coord from, Coord to)
 {
+    // Saving current Board and Game State
     SnapShot snap;
     snap.board = board.snapshot();
     snap.state = gameState;
 
     Piece movingPiece = board.getPiece(from);
 
+    // Making the move
     move(from, to);
 
+    // Finding if in check
     bool check = isKingInCheck(movingPiece.c);
 
+    // Undoing the move
     board.setMatrix(snap.board);
     gameState = snap.state;
 

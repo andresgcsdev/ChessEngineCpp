@@ -1,0 +1,26 @@
+[
+{
+  "directory": "/home/andre/codigo/chess/build",
+  "command": "/usr/bin/c++  -I/home/andre/codigo/chess/src -g -std=gnu++17 -o CMakeFiles/chess.dir/src/main.cpp.o -c /home/andre/codigo/chess/src/main.cpp",
+  "file": "/home/andre/codigo/chess/src/main.cpp",
+  "output": "CMakeFiles/chess.dir/src/main.cpp.o"
+},
+{
+  "directory": "/home/andre/codigo/chess/build",
+  "command": "/usr/bin/c++  -I/home/andre/codigo/chess/src -g -std=gnu++17 -o CMakeFiles/chess.dir/src/core/Board.cpp.o -c /home/andre/codigo/chess/src/core/Board.cpp",
+  "file": "/home/andre/codigo/chess/src/core/Board.cpp",
+  "output": "CMakeFiles/chess.dir/src/core/Board.cpp.o"
+},
+{
+  "directory": "/home/andre/codigo/chess/build",
+  "command": "/usr/bin/c++  -I/home/andre/codigo/chess/src -g -std=gnu++17 -o CMakeFiles/chess.dir/src/core/Game.cpp.o -c /home/andre/codigo/chess/src/core/Game.cpp",
+  "file": "/home/andre/codigo/chess/src/core/Game.cpp",
+  "output": "CMakeFiles/chess.dir/src/core/Game.cpp.o"
+},
+{
+  "directory": "/home/andre/codigo/chess/build",
+  "command": "/usr/bin/c++  -I/home/andre/codigo/chess/src -g -std=gnu++17 -o CMakeFiles/chess.dir/src/ui/ChessUI.cpp.o -c /home/andre/codigo/chess/src/ui/ChessUI.cpp",
+  "file": "/home/andre/codigo/chess/src/ui/ChessUI.cpp",
+  "output": "CMakeFiles/chess.dir/src/ui/ChessUI.cpp.o"
+}
+]

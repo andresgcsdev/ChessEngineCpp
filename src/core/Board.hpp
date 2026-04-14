@@ -1,3 +1,4 @@
+#pragma once
 #include <array>
 #include "Common.hpp"
 
@@ -17,10 +18,12 @@ public:
     void setMatrix(std::array<std::array<Piece, 8>, 8> newMatrix);
 
     // Returns piece at the given position.
-    Piece getPiece(Coord at);
+    Piece getPiece(Coord at) const;
 
     // Sets piece at given position.
     void setPiece(Coord at, Piece p);
+
+    Coord getCoordinates(Piece p) const;
 
 private:
     std::array<std::array<Piece, 8>, 8> matrix;
