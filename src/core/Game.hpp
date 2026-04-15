@@ -28,7 +28,7 @@ public:
     // Returns an array of invalid positions if no moves are available for that piece.
     std::array<Coord, 27> possibleMoves(Coord piece);
 
-    // True if king of color c is in check, False otherwise.
+    // True if king of color `c` is in check, False otherwise.
     bool isKingInCheck(Color c);
 
     // Calculates if the pieces of the matching `c` color have any possible moves.

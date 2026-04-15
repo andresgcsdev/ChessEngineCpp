@@ -184,7 +184,7 @@ std::array<Coord, 27> Game::rookMoves(Coord p)
         arr[i] = Coord{8, 8};
 
     Piece rook = board.getPiece(p);
-    if (rook.t != PieceType::ROOK)
+    if (rook.t != PieceType::ROOK && rook.t != PieceType::QUEEN)
         return arr;
 
     int moves[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
@@ -222,12 +222,12 @@ std::array<Coord, 27> Game::bishopMoves(Coord p)
 {
     std::array<Coord, 27> arr;
 
-    // Setting sentinel values - Remember to check
+    // Setting sentinel values - Remember to checks
     for (int i = 0; i < 27; i++)
         arr[i] = Coord{8, 8};
 
     Piece bishop = board.getPiece(p);
-    if (bishop.t != PieceType::BISHOP)
+    if (bishop.t != PieceType::BISHOP && bishop.t != PieceType::QUEEN)
         return arr;
 
     int moves[4][2] = {{1, 1}, {-1, 1}, {1, -1}, {-1, -1}};
