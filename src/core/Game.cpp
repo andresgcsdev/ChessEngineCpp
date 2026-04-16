@@ -490,6 +490,13 @@ bool Game::move(Coord from, Coord to)
             // Clearing last en passant coordinates, since it now has been 2 moves since the pawn moved
             gameState.enPassant = Coord{8, 8};
         }
+        if ((movingPiece.c == Color::WHITE && to.row == 0) ||
+            (movingPiece.c == Color::BLACK && to.row == 7))
+        {
+            Piece promoted = movingPiece;
+            promoted.t = PieceType::QUEEN;
+            board.setPiece(to, promoted);
+        }
     }
     else
     {
