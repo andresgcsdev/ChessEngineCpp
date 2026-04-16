@@ -1,3 +1,0 @@
-/home/andre/codigo/chess/build/CMakeFiles/chess.dir
-/home/andre/codigo/chess/build/CMakeFiles/edit_cache.dir
-/home/andre/codigo/chess/build/CMakeFiles/rebuild_cache.dir
