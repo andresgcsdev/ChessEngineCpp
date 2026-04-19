@@ -4,6 +4,9 @@
 #include "Board.hpp"
 #include "Common.hpp"
 
+// Controller Class.
+// Manages all chess logic, rules, and game state.
+// Operates on the Board through moves, validation, and turn management.
 class Game
 {
 public:
@@ -21,7 +24,13 @@ public:
 
     // Validates and makes the move, returning true if the move was done and false if the move was illegal and couldn't be done.
     // Also saves the last board state in the history.
+    // Used for player moves that access the ui.
     bool makeMove(Coord from, Coord to);
+
+    // Validates and applies the move.
+    // Does not save the last board state in the history.
+    // Tracking and storing the previous states are responsibility of the caller.
+    void applyMove(Coord from, Coord to);
 
     // Returns an array of all possible moves the piece can make from the given position.
     // Possible moves are the ones that follow chess rules and do not result on checks of oneself's king.
@@ -35,8 +44,12 @@ public:
     // Returns true if any move is found, false if not.
     bool hasMoves(Color c);
 
-    // Reverts the board to its previous state in history.
-    void revertState(SnapShot &snap);
+    // Reverts the board and game states to the previous state in the history.
+    // Used for undoing player moves.
+    void undo();
+
+    // Reverts the board and game states to the SnapShot's.
+    void revertState(const SnapShot &snap);
 
 private:
     std::stack<SnapShot> history;
@@ -51,26 +64,32 @@ private:
 
     // Returns an array of possible pawn moves of the given piece.
     // Does not consider self king checks on the calculations.
+    // May return an emtpy array if the given coordinates aren't of a pawn.
     std::array<Coord, 27> pawnMoves(Coord piece);
 
     // Returns an array of possible rook moves of the given piece.
     // Does not consider self king checks on the calculations.
+    // May return an emtpy array if the given coordinates aren't of a rook.
     std::array<Coord, 27> rookMoves(Coord piece);
 
     // Returns an array of possible knight moves of the given piece.
     // Does not consider self king checks on the calculations.
+    // May return an emtpy array if the given coordinates aren't of a knight.
     std::array<Coord, 27> knightMoves(Coord piece);
 
     // Returns an array of possible bishop moves of the given piece.
     // Does not consider self king checks on the calculations.
+    // May return an emtpy array if the given coordinates aren't of a bishop.
     std::array<Coord, 27> bishopMoves(Coord piece);
 
     // Returns an array of possible queen moves of the given piece.
     // Does not consider self king checks on the calculations.
+    // May return an emtpy array if the given coordinates aren't of a queen.
     std::array<Coord, 27> queenMoves(Coord piece);
 
     // Returns an array of possible king moves of the given piece.
     // Does not consider self king checks on the calculations.
+    // May return an emtpy array if the given coordinates aren't of a king.
     std::array<Coord, 27> kingMoves(Coord piece);
 
     // Execute a move on the board. ASSUMES move has been validated by caller.

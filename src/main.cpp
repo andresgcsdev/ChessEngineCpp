@@ -11,7 +11,7 @@ int main()
     bool running = true;
     while (running)
     {
-        ui.cls();
+        // ui.cls(); Uncomment before pushing! (Commented because CLion terminal does not support it very well)
         ui.printBoard(g.getBoard(), g.getTurn());
         if (g.hasMoves(g.getTurn()))
         {
@@ -48,6 +48,10 @@ int main()
                                 isPossible = true;
                                 break;
                             }
+                        }
+                        else
+                        {
+                            break;
                         }
                     }
                 }

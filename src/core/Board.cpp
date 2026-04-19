@@ -24,8 +24,8 @@ Piece Board::getPiece(const Coord at) const
     {
         return matrix[at.row][at.col];
     }
-    else
-        return Piece{PieceType::ERROR};
+
+    return Piece{PieceType::ERROR};
 }
 
 void Board::setPiece(const Coord at, const Piece p)
@@ -38,11 +38,11 @@ void Board::setPiece(const Coord at, const Piece p)
 
 Coord Board::getCoordinates(const Piece p) const
 {
-    for(int i = 0; i < 8; i++)
+    for (int i = 0; i < 8; i++)
     {
-        for(int j = 0; j < 8; j++)
+        for (int j = 0; j < 8; j++)
         {
-            if(getPiece(Coord{i, j}) == p)
+            if (getPiece(Coord{i, j}) == p)
                 return Coord{i, j};
         }
     }

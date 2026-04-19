@@ -10,6 +10,7 @@ add_executable(chess
     src/core/Game.cpp
     src/ui/ChessUI.cpp
         src/core/Engine.hpp
+        src/core/Engine.cpp
 )
 
 target_include_directories(chess PRIVATE src)

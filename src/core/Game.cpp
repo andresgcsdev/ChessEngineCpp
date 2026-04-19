@@ -4,7 +4,8 @@
 #include "Board.hpp"
 #include "Common.hpp"
 
-Game::Game() {
+Game::Game()
+{
     gameState.turn = Color::WHITE;
     gameState.enPassant = Coord{8, 8};
     blackKing = Coord{0, 4};
@@ -23,7 +24,8 @@ Game::Game() {
     matrix[7][7] = Piece{PieceType::ROOK, Color::WHITE, '2'};
 
     // Row 1 (White pawns)
-    for (int col = 0; col < 8; col++) {
+    for (int col = 0; col < 8; col++)
+    {
         matrix[6][col] = Piece{PieceType::PAWN, Color::WHITE, static_cast<char>('1' + col)};
     }
 
@@ -38,7 +40,8 @@ Game::Game() {
     matrix[0][7] = Piece{PieceType::ROOK, Color::BLACK, '2'};
 
     // Row 6 (Black pawns)
-    for (int col = 0; col < 8; col++) {
+    for (int col = 0; col < 8; col++)
+    {
         matrix[1][col] = Piece{PieceType::PAWN, Color::BLACK, static_cast<char>('1' + col)};
     }
 
@@ -47,19 +50,23 @@ Game::Game() {
     board.setMatrix(matrix);
 }
 
-Board Game::getBoard() {
+Board Game::getBoard()
+{
     return board;
 }
 
-Color Game::getTurn() {
+Color Game::getTurn()
+{
     return gameState.turn;
 }
 
-void Game::changeTurn() {
+void Game::changeTurn()
+{
     gameState.turn = gameState.turn == Color::BLACK ? Color::WHITE : Color::BLACK;
 }
 
-std::array<Coord, 27> Game::pawnMoves(Coord p) {
+std::array<Coord, 27> Game::pawnMoves(Coord p)
+{
     std::array<Coord, 27> arr;
 
     // Setting sentinel values - Remember to check
@@ -71,52 +78,65 @@ std::array<Coord, 27> Game::pawnMoves(Coord p) {
         return arr;
 
     int moves[4][2] = {{1, 0}, {2, 0}, {1, 1}, {1, -1}};;
-    if (pawn.c == Color::WHITE) {
-        for (int i = 0; i < 4; i++) {
+    if (pawn.c == Color::WHITE)
+    {
+        for (int i = 0; i < 4; i++)
+        {
             moves[i][0] *= -1;
             moves[i][1] *= -1;
         }
     }
 
     int k = 0;
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; i++)
+    {
         Coord currentMove = Coord{p.row + moves[i][0], p.col + moves[i][1]};
-        if (isValidCoord(currentMove)) {
+        Piece to = board.getPiece(currentMove);
+        if (isValidCoord(currentMove))
+        {
             // Diagonals
-            if (moves[i][1] == 1 || moves[i][1] == -1) {
-                if ((board.getPiece(currentMove).c != pawn.c &&
-                     board.getPiece(currentMove).t != PieceType::BLANK)) {
+            if (moves[i][1] == 1 || moves[i][1] == -1)
+            {
+                if ((to.c != pawn.c &&
+                     to.t != PieceType::BLANK))
+                {
                     arr[k] = currentMove;
                     k++;
                 }
                 // En passant check, making sure it is only allowed when the space is blank and when it is the piece's turn (to avoid misscalculations in finding the control areas)
                 if ((gameState.enPassant == currentMove &&
-                     board.getPiece(currentMove).t == PieceType::BLANK &&
-                     gameState.turn == pawn.c)) {
+                     to.t == PieceType::BLANK &&
+                     gameState.turn == pawn.c))
+                {
                     arr[k] = currentMove;
                     k++;
                 }
             }
             // Move 1 to the front
-            else if (moves[i][0] == 1 || moves[i][0] == -1) {
-                if (board.getPiece(currentMove).t == PieceType::BLANK) {
+            else if (moves[i][0] == 1 || moves[i][0] == -1)
+            {
+                if (to.t == PieceType::BLANK)
+                {
                     arr[k] = currentMove;
                     k++;
                 }
             }
             // Move 2 to the front
-            else if (moves[i][0] == 2 || moves[i][0] == -2) {
+            else if (moves[i][0] == 2 || moves[i][0] == -2)
+            {
                 if (pawn.c == Color::BLACK &&
-                    board.getPiece(currentMove).t == PieceType::BLANK &&
+                    to.t == PieceType::BLANK &&
                     board.getPiece(Coord{p.row + 1, p.col}).t == PieceType::BLANK &&
-                    p.row == 1) {
+                    p.row == 1)
+                {
                     arr[k] = currentMove;
                     k++;
                 }
                 if (pawn.c == Color::WHITE &&
-                    board.getPiece(currentMove).t == PieceType::BLANK &&
+                    to.t == PieceType::BLANK &&
                     board.getPiece(Coord{p.row - 1, p.col}).t == PieceType::BLANK &&
-                    p.row == 6) {
+                    p.row == 6)
+                {
                     arr[k] = currentMove;
                     k++;
                 }
@@ -127,7 +147,8 @@ std::array<Coord, 27> Game::pawnMoves(Coord p) {
     return arr;
 }
 
-std::array<Coord, 27> Game::knightMoves(Coord p) {
+std::array<Coord, 27> Game::knightMoves(Coord p)
+{
     std::array<Coord, 27> arr;
 
     // Setting sentinel values - Remember to check
@@ -142,10 +163,14 @@ std::array<Coord, 27> Game::knightMoves(Coord p) {
     int moves[8][2] = {{-2, 1}, {2, 1}, {-2, -1}, {2, -1}, {1, -2}, {1, 2}, {-1, -2}, {-1, 2}};
 
     int k = 0;
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 8; i++)
+    {
         Coord currentMove = Coord{p.row + moves[i][0], p.col + moves[i][1]};
-        if (isValidCoord(currentMove)) {
-            if (board.getPiece(currentMove).t == PieceType::BLANK || board.getPiece(currentMove).c != knight.c) {
+        Piece to = board.getPiece(currentMove);
+        if (isValidCoord(currentMove))
+        {
+            if (to.t == PieceType::BLANK || to.c != knight.c)
+            {
                 arr[k] = currentMove;
                 k++;
             }
@@ -155,7 +180,8 @@ std::array<Coord, 27> Game::knightMoves(Coord p) {
     return arr;
 }
 
-std::array<Coord, 27> Game::rookMoves(Coord p) {
+std::array<Coord, 27> Game::rookMoves(Coord p)
+{
     std::array<Coord, 27> arr;
 
     // Setting sentinel values - Remember to check
@@ -168,20 +194,29 @@ std::array<Coord, 27> Game::rookMoves(Coord p) {
 
     int moves[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
     int k = 0;
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; i++)
+    {
         // Slide orthogonally in each direction until hitting a piece or board edge
-        for (int j = 1; j < 8; j++) {
+        for (int j = 1; j < 8; j++)
+        {
             Coord currentMove = Coord{p.row + (j * moves[i][0]), p.col + (j * moves[i][1])};
-            if (isValidCoord(currentMove)) {
-                if (board.getPiece(currentMove).t == PieceType::BLANK) {
+            Piece to = board.getPiece(currentMove);
+            if (isValidCoord(currentMove))
+            {
+                if (to.t == PieceType::BLANK)
+                {
                     arr[k] = currentMove;
                     k++;
-                } else if (board.getPiece(currentMove).c != rook.c) {
+                }
+                else if (to.c != rook.c)
+                {
                     arr[k] = currentMove;
                     k++;
-                } else
+                }
+                else
                     break;
-            } else
+            }
+            else
                 break;
         }
     }
@@ -189,7 +224,8 @@ std::array<Coord, 27> Game::rookMoves(Coord p) {
     return arr;
 }
 
-std::array<Coord, 27> Game::bishopMoves(Coord p) {
+std::array<Coord, 27> Game::bishopMoves(Coord p)
+{
     std::array<Coord, 27> arr;
 
     // Setting sentinel values - Remember to check
@@ -202,20 +238,29 @@ std::array<Coord, 27> Game::bishopMoves(Coord p) {
 
     int moves[4][2] = {{1, 1}, {-1, 1}, {1, -1}, {-1, -1}};
     int k = 0;
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; i++)
+    {
         // Slide diagonally in each direction until hitting a piece or board edge
-        for (int j = 1; j < 8; j++) {
+        for (int j = 1; j < 8; j++)
+        {
             Coord currentMove = Coord{p.row + (j * moves[i][0]), p.col + (j * moves[i][1])};
-            if (isValidCoord(currentMove)) {
-                if (board.getPiece(currentMove).t == PieceType::BLANK) {
+            Piece to = board.getPiece(currentMove);
+            if (isValidCoord(currentMove))
+            {
+                if (to.t == PieceType::BLANK)
+                {
                     arr[k] = currentMove;
                     k++;
-                } else if (board.getPiece(currentMove).c != bishop.c) {
+                }
+                else if (to.c != bishop.c)
+                {
                     arr[k] = currentMove;
                     k++;
-                } else
+                }
+                else
                     break;
-            } else
+            }
+            else
                 break;
         }
     }
@@ -223,7 +268,8 @@ std::array<Coord, 27> Game::bishopMoves(Coord p) {
     return arr;
 }
 
-std::array<Coord, 27> Game::queenMoves(Coord p) {
+std::array<Coord, 27> Game::queenMoves(Coord p)
+{
     std::array<Coord, 27> arr;
 
     // Setting sentinel values - Remember to check
@@ -237,8 +283,10 @@ std::array<Coord, 27> Game::queenMoves(Coord p) {
     // Perpendicular moves
     arr = rookMoves(p);
     int k = 0;
-    for (int i = 0; i < 27; i++) {
-        if (arr[i] == Coord{8, 8}) {
+    for (int i = 0; i < 27; i++)
+    {
+        if (arr[i] == Coord{8, 8})
+        {
             k = i;
             break;
         }
@@ -246,14 +294,16 @@ std::array<Coord, 27> Game::queenMoves(Coord p) {
 
     // Diagonal moves
     std::array<Coord, 27> bishop = bishopMoves(p);
-    for (int i = k; i < 27; i++) {
+    for (int i = k; i < 27; i++)
+    {
         arr[i] = bishop[i - k];
     }
 
     return arr;
 }
 
-std::array<Coord, 27> Game::kingMoves(Coord p) {
+std::array<Coord, 27> Game::kingMoves(Coord p)
+{
     std::array<Coord, 27> arr;
 
     // Setting sentinel values - Remember to check
@@ -268,10 +318,14 @@ std::array<Coord, 27> Game::kingMoves(Coord p) {
     int moves[8][2] = {{1, 0}, {1, 1}, {1, -1}, {-1, 0}, {-1, 1}, {-1, -1}, {0, 1}, {0, -1}};
 
     int k = 0;
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 8; i++)
+    {
         Coord currentMove = Coord{p.row + moves[i][0], p.col + moves[i][1]};
-        if (isValidCoord(currentMove)) {
-            if (board.getPiece(currentMove).t == PieceType::BLANK || board.getPiece(currentMove).c != king.c) {
+        Piece to = board.getPiece(currentMove);
+        if (isValidCoord(currentMove))
+        {
+            if (to.t == PieceType::BLANK || to.c != king.c)
+            {
                 arr[k] = currentMove;
                 k++;
             }
@@ -280,38 +334,48 @@ std::array<Coord, 27> Game::kingMoves(Coord p) {
 
     int colorIndex = king.c == Color::BLACK ? 1 : 0;
     // Castling queen side
-    if (gameState.castling[0][colorIndex]) {
+    if (gameState.castling[0][colorIndex])
+    {
         Coord currentMove = Coord{p.row, p.col - 2};
         Coord id1RookToKingSpaces[3] = {Coord{p.row, p.col - 1}, Coord{p.row, p.col - 2}, Coord{p.row, p.col - 3}};
-        if (isValidCoord(id1RookToKingSpaces[0]) && isValidCoord(id1RookToKingSpaces[1])) {
+        if (isValidCoord(id1RookToKingSpaces[0]) && isValidCoord(id1RookToKingSpaces[1]))
+        {
             bool allBlankAndNotInControl = true;
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < 3; i++)
+            {
                 if (board.getPiece(id1RookToKingSpaces[i]).t != PieceType::BLANK ||
-                    isControlledBy(id1RookToKingSpaces[i], king.c == Color::BLACK ? Color::WHITE : Color::BLACK)) {
+                    isControlledBy(id1RookToKingSpaces[i], king.c == Color::BLACK ? Color::WHITE : Color::BLACK))
+                {
                     allBlankAndNotInControl = false;
                     break;
                 }
             }
-            if (allBlankAndNotInControl) {
+            if (allBlankAndNotInControl)
+            {
                 arr[k] = currentMove;
                 k++;
             }
         }
     }
     // Castling king side
-    if (gameState.castling[1][colorIndex]) {
+    if (gameState.castling[1][colorIndex])
+    {
         Coord currentMove = Coord{p.row, p.col + 2};
         Coord id1RookToKingSpaces[2] = {Coord{p.row, p.col + 1}, Coord{p.row, p.col + 2}};
-        if (isValidCoord(id1RookToKingSpaces[0]) && isValidCoord(id1RookToKingSpaces[1])) {
+        if (isValidCoord(id1RookToKingSpaces[0]) && isValidCoord(id1RookToKingSpaces[1]))
+        {
             bool allBlankAndNotInControl = true;
-            for (int i = 0; i < 2; i++) {
+            for (int i = 0; i < 2; i++)
+            {
                 if (board.getPiece(id1RookToKingSpaces[i]).t != PieceType::BLANK ||
-                    isControlledBy(id1RookToKingSpaces[i], king.c == Color::BLACK ? Color::WHITE : Color::BLACK)) {
+                    isControlledBy(id1RookToKingSpaces[i], king.c == Color::BLACK ? Color::WHITE : Color::BLACK))
+                {
                     allBlankAndNotInControl = false;
                     break;
                 }
             }
-            if (allBlankAndNotInControl) {
+            if (allBlankAndNotInControl)
+            {
                 arr[k] = currentMove;
                 k++;
             }
@@ -321,12 +385,15 @@ std::array<Coord, 27> Game::kingMoves(Coord p) {
     return arr;
 }
 
-bool Game::isControlledBy(Coord sq, Color attacker) {
+bool Game::isControlledBy(Coord sq, Color attacker)
+{
     // Check for Knights
     int knightMoves[8][2] = {{-2, 1}, {-2, -1}, {2, 1}, {2, -1}, {1, -2}, {1, 2}, {-1, -2}, {-1, 2}};
-    for (auto &m: knightMoves) {
+    for (auto &m: knightMoves)
+    {
         Coord target = {sq.row + m[0], sq.col + m[1]};
-        if (isValidCoord(target)) {
+        if (isValidCoord(target))
+        {
             Piece p = board.getPiece(target);
             if (p.t == PieceType::KNIGHT && p.c == attacker)
                 return true;
@@ -335,21 +402,28 @@ bool Game::isControlledBy(Coord sq, Color attacker) {
 
     // Check for Sliders (Rooks, Bishops, Queens)
     int directions[8][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
-    for (int i = 0; i < 8; i++) {
-        for (int d = 1; d < 8; d++) {
+    for (int i = 0; i < 8; i++)
+    {
+        for (int d = 1; d < 8; d++)
+        {
             Coord target = {sq.row + (directions[i][0] * d), sq.col + (directions[i][1] * d)};
             if (!isValidCoord(target))
                 break;
 
             Piece p = board.getPiece(target);
-            if (p.t != PieceType::BLANK) {
-                if (p.c == attacker) {
+            if (p.t != PieceType::BLANK)
+            {
+                if (p.c == attacker)
+                {
                     // Check if piece type matches the direction (Orthogonal vs Diagonal)
-                    if (i < 4) {
+                    if (i < 4)
+                    {
                         // Orthogonal (Rook/Queen)
                         if (p.t == PieceType::ROOK || p.t == PieceType::QUEEN)
                             return true;
-                    } else {
+                    }
+                    else
+                    {
                         // Diagonal (Bishop/Queen)
                         if (p.t == PieceType::BISHOP || p.t == PieceType::QUEEN)
                             return true;
@@ -366,9 +440,11 @@ bool Game::isControlledBy(Coord sq, Color attacker) {
     int pawnRowDiff = (attacker == Color::WHITE) ? -1 : 1;
     int pawnCols[2] = {sq.col - 1, sq.col + 1};
 
-    for (int c: pawnCols) {
+    for (int c: pawnCols)
+    {
         Coord target = {sq.row + pawnRowDiff, c};
-        if (isValidCoord(target)) {
+        if (isValidCoord(target))
+        {
             Piece p = board.getPiece(target);
             if (p.t == PieceType::PAWN && p.c == attacker)
                 return true;
@@ -377,9 +453,11 @@ bool Game::isControlledBy(Coord sq, Color attacker) {
 
     // 4. Check for King (to prevent Kings from standing next to each other)
     int kingMoves[8][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
-    for (auto &m: kingMoves) {
+    for (auto &m: kingMoves)
+    {
         Coord target = {sq.row + m[0], sq.col + m[1]};
-        if (isValidCoord(target)) {
+        if (isValidCoord(target))
+        {
             Piece p = board.getPiece(target);
             if (p.t == PieceType::KING && p.c == attacker)
                 return true;
@@ -389,22 +467,28 @@ bool Game::isControlledBy(Coord sq, Color attacker) {
     return false;
 }
 
-bool Game::move(Coord from, Coord to) {
+bool Game::move(Coord from, Coord to)
+{
     Piece movingPiece = board.getPiece(from);
 
     // Making sure all arguments are valid
     if (movingPiece.t == PieceType::BLANK || movingPiece.t == PieceType::ERROR || !isValidCoord(to))
         return false;
 
-    if (movingPiece.t == PieceType::PAWN) {
+    if (movingPiece.t == PieceType::PAWN)
+    {
         // Updating last en passant coordinates
-        if (to == Coord{from.row + 2, from.col} || to == Coord{from.row - 2, from.col}) {
+        if (to == Coord{from.row + 2, from.col} || to == Coord{from.row - 2, from.col})
+        {
             if (movingPiece.c == Color::BLACK)
                 gameState.enPassant = Coord{from.row + 1, from.col};
             else
                 gameState.enPassant = Coord{from.row - 1, from.col};
-        } else {
-            if (to == gameState.enPassant) {
+        }
+        else
+        {
+            if (to == gameState.enPassant)
+            {
                 Coord removePawn = Coord{from.row, gameState.enPassant.col};
                 board.setPiece(removePawn, Piece{PieceType::BLANK, Color::BLACK, 'b'});
             }
@@ -412,24 +496,30 @@ bool Game::move(Coord from, Coord to) {
             gameState.enPassant = Coord{8, 8};
         }
         if ((movingPiece.c == Color::WHITE && to.row == 0) ||
-            (movingPiece.c == Color::BLACK && to.row == 7)) {
+            (movingPiece.c == Color::BLACK && to.row == 7))
+        {
             Piece promoted = movingPiece;
             promoted.t = PieceType::QUEEN;
             board.setPiece(to, promoted);
         }
-    } else {
+    }
+    else
+    {
         // Clearing last en passant coordinates, since it now has been 2 moves since the pawn moved
         gameState.enPassant = Coord{8, 8};
 
         // Updating castling logic and moving the rook
-        if (movingPiece.t == PieceType::ROOK) {
+        if (movingPiece.t == PieceType::ROOK)
+        {
             // Removing castling possibility after rook move
             int colorIndex = movingPiece.c == Color::BLACK ? 1 : 0;
             gameState.castling[movingPiece.id - '1'][colorIndex] = false;
         }
-        if (movingPiece.t == PieceType::KING) {
+        if (movingPiece.t == PieceType::KING)
+        {
             // Setting king side rook to the right of the king
-            if (to == Coord{from.row, from.col + 2}) {
+            if (to == Coord{from.row, from.col + 2})
+            {
                 Piece rookKingSide = Piece{PieceType::ROOK, movingPiece.c, '2'};
                 board.setPiece(Coord{from.row, from.col + 1}, rookKingSide);
 
@@ -437,7 +527,8 @@ bool Game::move(Coord from, Coord to) {
                 board.setPiece(Coord{from.row, from.col + 3}, Piece{PieceType::BLANK, Color::BLACK, 'b'});
             }
             // Setting queen side rook to the left of the king
-            else if (to == Coord{from.row, from.col - 2}) {
+            else if (to == Coord{from.row, from.col - 2})
+            {
                 Piece rookKingSide = Piece{PieceType::ROOK, movingPiece.c, '1'};
                 board.setPiece(Coord{from.row, from.col - 1}, rookKingSide);
 
@@ -446,7 +537,8 @@ bool Game::move(Coord from, Coord to) {
             }
 
             int colorIndex = movingPiece.c == Color::BLACK ? 1 : 0;
-            if (gameState.castling[0][colorIndex] || gameState.castling[1][colorIndex]) {
+            if (gameState.castling[0][colorIndex] || gameState.castling[1][colorIndex])
+            {
                 gameState.castling[0][colorIndex] = false;
                 gameState.castling[1][colorIndex] = false;
             }
@@ -457,7 +549,8 @@ bool Game::move(Coord from, Coord to) {
     board.setPiece(from, Piece{PieceType::BLANK, Color::BLACK, 'b'});
 
     // Fixing king tracking
-    if (movingPiece.t == PieceType::KING) {
+    if (movingPiece.t == PieceType::KING)
+    {
         if (movingPiece.c == Color::BLACK)
             blackKing = to;
         else
@@ -467,26 +560,28 @@ bool Game::move(Coord from, Coord to) {
     return true;
 }
 
-void Game::setHistory() {
-    SnapShot snap;
-    snap.board = board.snapshot();
-    snap.state = gameState;
+void Game::setHistory()
+{
+    SnapShot snap = SnapShot{board.snapshot(), gameState};
     history.push(snap);
 }
 
-void Game::revertState(SnapShot &snap) {
+void Game::revertState(const SnapShot &snap)
+{
     gameState = snap.state;
     board.setMatrix(snap.board);
 }
 
-bool Game::isKingInCheck(Color c) {
+bool Game::isKingInCheck(Color c)
+{
     if (c == Color::BLACK)
         return isControlledBy(blackKing, Color::WHITE);
     else
         return isControlledBy(whiteKing, Color::BLACK);
 }
 
-std::array<Coord, 27> Game::possibleMoves(Coord piece) {
+std::array<Coord, 27> Game::possibleMoves(Coord piece)
+{
     std::array<Coord, 27> arr;
 
     // Setting sentinel values - Remember to check
@@ -499,7 +594,8 @@ std::array<Coord, 27> Game::possibleMoves(Coord piece) {
         return arr;
 
     // Finding possible moves without checking for validity
-    switch (p.t) {
+    switch (p.t)
+    {
         case PieceType::PAWN:
             arr = pawnMoves(piece);
             break;
@@ -535,11 +631,13 @@ std::array<Coord, 27> Game::possibleMoves(Coord piece) {
 
     int k = 0;
     // Making sure the obtained moves don't result in check on self king
-    for (int i = 0; i < 27; i++) {
+    for (int i = 0; i < 27; i++)
+    {
         if (arr[i] == Coord{8, 8})
             break;
 
-        if (!testForCheck(piece, arr[i])) {
+        if (!testForCheck(piece, arr[i]))
+        {
             possible[k] = arr[i];
             k++;
         }
@@ -548,10 +646,14 @@ std::array<Coord, 27> Game::possibleMoves(Coord piece) {
     return possible;
 }
 
-bool Game::hasMoves(Color c) {
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) {
-            if (board.getPiece(Coord{i, j}).c == c && board.getPiece(Coord{i, j}).t != PieceType::BLANK) {
+bool Game::hasMoves(Color c)
+{
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            if (board.getPiece(Coord{i, j}).c == c && board.getPiece(Coord{i, j}).t != PieceType::BLANK)
+            {
                 if (possibleMoves(Coord{i, j})[0] != Coord{8, 8})
                     return true;
             }
@@ -561,11 +663,10 @@ bool Game::hasMoves(Color c) {
     return false;
 }
 
-bool Game::testForCheck(Coord from, Coord to) {
+bool Game::testForCheck(Coord from, Coord to)
+{
     // Saving current Board and Game State
-    SnapShot snap;
-    snap.board = board.snapshot();
-    snap.state = gameState;
+    SnapShot snap = SnapShot{board.snapshot(), gameState};
 
     Piece movingPiece = board.getPiece(from);
 
@@ -575,14 +676,27 @@ bool Game::testForCheck(Coord from, Coord to) {
     // Finding if in check
     bool check = isKingInCheck(movingPiece.c);
 
-    // Undoing the move
-    board.setMatrix(snap.board);
-    gameState = snap.state;
+    revertState(snap);
 
     return check;
 }
 
-bool Game::makeMove(Coord from, Coord to) {
+bool Game::makeMove(Coord from, Coord to)
+{
     setHistory();
     return move(from, to);
+}
+
+void Game::applyMove(Coord from, Coord to)
+{
+    move(from, to);
+}
+
+void Game::undo()
+{
+    const SnapShot snap = history.top();
+    history.pop();
+
+    board.setMatrix(snap.board);
+    gameState = snap.state;
 }

@@ -1,26 +1,35 @@
 #pragma once
 #include <array>
+#include <string>
 #include <iostream>
 #include "core/Board.hpp"
-#include <cstdlib>
 
+// View Class.
+// Handles all user input and output.
+// No chess logic or board state — only rendering and input translation.
 class ChessUI
 {
 public:
     // Prints the board based on the color orientation.
     void printBoard(const Board &b, Color orientation) const;
+
     // Wrapper for a getline().
     std::string getInput() const;
+
     // Matches the input text to a possible piece.
     // Returns a Piece with a PieceType::ERROR if no matches are possible.
-    Piece translatePiece( std::string p) const;
+    Piece translatePiece(std::string p) const;
+
     // Matches the input text to a possible coordinate on the board.
-    // Returns an Out of Bounds piece {8, 8} if no matches are possible.
+    // Returns an Out-of-Bounds `Coord {8, 8}` if no matches are possible.
     Coord translateCoordinates(std::string coord) const;
+
     // Wrapper for a simple cout statement with an endl.
     void println(std::string s) const;
+
     // Prints all possible moves inside a Coord[27] array.
     void printMoves(const std::array<Coord, 27> &posb) const;
+
     // Clear Screen.
     void cls() const;
 

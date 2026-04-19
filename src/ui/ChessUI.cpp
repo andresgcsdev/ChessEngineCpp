@@ -1,4 +1,5 @@
 #include <array>
+#include <string>
 #include <iostream>
 #include "ChessUI.hpp"
 #include "core/Board.hpp"
@@ -20,60 +21,60 @@ void ChessUI::printBoard(const Board &b, Color orientation) const
             std::string piecePrint;
             switch (p.c)
             {
-            case Color::WHITE:
-                piecePrint.append("W");
-                break;
+                case Color::WHITE:
+                    piecePrint.append("W");
+                    break;
 
-            case Color::BLACK:
-                piecePrint.append("B");
-                break;
+                case Color::BLACK:
+                    piecePrint.append("B");
+                    break;
 
-            default:
-                break;
+                default:
+                    break;
             }
 
             switch (p.t)
             {
-            case PieceType::PAWN:
-                piecePrint.append("P");
-                break;
+                case PieceType::PAWN:
+                    piecePrint.append("P");
+                    break;
 
-            case PieceType::ROOK:
-                piecePrint.append("R");
-                break;
+                case PieceType::ROOK:
+                    piecePrint.append("R");
+                    break;
 
-            case PieceType::KNIGHT:
-                piecePrint.append("N");
-                break;
+                case PieceType::KNIGHT:
+                    piecePrint.append("N");
+                    break;
 
-            case PieceType::BISHOP:
-                piecePrint.append("B");
-                break;
+                case PieceType::BISHOP:
+                    piecePrint.append("B");
+                    break;
 
-            case PieceType::QUEEN:
-                piecePrint.append("Q");
-                break;
+                case PieceType::QUEEN:
+                    piecePrint.append("Q");
+                    break;
 
-            case PieceType::KING:
-                piecePrint.append("K");
-                break;
+                case PieceType::KING:
+                    piecePrint.append("K");
+                    break;
 
-            case PieceType::BLANK:
-                piecePrint = "   ";
-                break;
+                case PieceType::BLANK:
+                    piecePrint = "   ";
+                    break;
 
-            default:
-                break;
+                default:
+                    break;
             }
 
             switch (p.id)
             {
-            case 'b':
-                break;
+                case 'b':
+                    break;
 
-            default:
-                piecePrint += p.id;
-                break;
+                default:
+                    piecePrint += p.id;
+                    break;
             }
 
             std::cout << "[" << piecePrint << "]";
@@ -111,46 +112,46 @@ Piece ChessUI::translatePiece(std::string p) const
 
     switch (p.at(0))
     {
-    case 'W':
-        piece.c = Color::WHITE;
-        break;
+        case 'W':
+            piece.c = Color::WHITE;
+            break;
 
-    case 'B':
-        piece.c = Color::BLACK;
-        break;
+        case 'B':
+            piece.c = Color::BLACK;
+            break;
 
-    default:
-        return error;
+        default:
+            return error;
     }
 
     switch (p.at(1))
     {
-    case 'P':
-        piece.t = PieceType::PAWN;
-        break;
+        case 'P':
+            piece.t = PieceType::PAWN;
+            break;
 
-    case 'R':
-        piece.t = PieceType::ROOK;
-        break;
+        case 'R':
+            piece.t = PieceType::ROOK;
+            break;
 
-    case 'N':
-        piece.t = PieceType::KNIGHT;
-        break;
+        case 'N':
+            piece.t = PieceType::KNIGHT;
+            break;
 
-    case 'B':
-        piece.t = PieceType::BISHOP;
-        break;
+        case 'B':
+            piece.t = PieceType::BISHOP;
+            break;
 
-    case 'Q':
-        piece.t = PieceType::QUEEN;
-        break;
+        case 'Q':
+            piece.t = PieceType::QUEEN;
+            break;
 
-    case 'K':
-        piece.t = PieceType::KING;
-        break;
+        case 'K':
+            piece.t = PieceType::KING;
+            break;
 
-    default:
-        return error;
+        default:
+            return error;
     }
 
     if (p.at(2) < '0' || p.at(2) > '8')
@@ -201,8 +202,7 @@ void ChessUI::printMoves(const std::array<Coord, 27> &posb) const
         if (isValidCoord(posb[i]))
         {
             std::cout << convertCoordToText(posb[i]) << " ";
-        }
-        else
+        } else
         {
             if (i > 0)
                 std::cout << std::endl;
