@@ -13,7 +13,6 @@ int main()
     bool running = true;
     while (running)
     {
-        // ui.cls(); Uncomment before pushing! (Commented because CLion terminal does not support it very well)
         if (g.hasMoves(g.getTurn()))
         {
             if (g.getTurn() == Color::BLACK)
