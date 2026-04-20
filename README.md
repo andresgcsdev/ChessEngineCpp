@@ -25,6 +25,7 @@ A C++ chess engine featuring a fully functional game implementation with AI oppo
 ```bash
 git clone https://github.com/andresgcsdev/ChessEngineCpp.git
 cd ChessEngineCpp
+mkdir build
 cmake -B build
 cmake --build build
 ```
@@ -38,9 +39,9 @@ The executable will be at build/chess on Linux/Mac or build/Debug/chess.exe on W
 Run the executable and follow the on-screen prompts:
 
 ```bash
-./chess.exe  # or ./chess on Linux/Mac
+./chess  # or ./chess.exe on Windows
 ```
-
+- Select the piece you want to move
 - Enter coordinates in algebraic notation (e.g., `e2` or `h8`)
 - White plays first
 - The AI (black) will respond with its best move
