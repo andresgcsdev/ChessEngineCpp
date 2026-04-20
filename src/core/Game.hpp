@@ -51,6 +51,9 @@ public:
     // Returns a SnapShot of current board and game states.
     SnapShot getSnap() const;
 
+    // Returns a copy of the current game history.
+    std::stack<SnapShot> getHistory() const;
+
 private:
     std::stack<SnapShot> history;
     Board board;

@@ -706,3 +706,9 @@ SnapShot Game::getSnap() const
 {
     return SnapShot{board.snapshot(), gameState};
 }
+
+std::stack<SnapShot> Game::getHistory() const
+{
+    return history;
+}
+
