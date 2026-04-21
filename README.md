@@ -48,6 +48,30 @@ Run the executable and follow the on-screen prompts:
 
 ---
 
+## Testing
+
+Comprehensive unit test suite covering:
+- **Common**: Coordinate/piece validation and equality operators
+- **UI**: Text-to-piece, text-to-coordinate, and piece-to-text transformations
+- **Board**: Initialization, matrix operations, piece lookup, move execution
+- **Game** (in progress): Move validation, check/checkmate detection, castling, en passant
+
+### Run Tests
+
+```bash
+cmake --build cmake-build-debug --target chess_test
+./cmake-build-debug/chess_test
+```
+
+### Test Infrastructure
+
+- FEN notation generator for board state validation
+- FEN parser for easy position setup in test cases
+- Test cases organized by component and complexity
+- All systems nominal when tests pass ✓
+
+---
+
 ## Architecture
 
 ### Core Components
@@ -111,7 +135,6 @@ This version is the result of all of that. Same problem, finally complete.
 
 - Alpha-beta pruning for faster search
 - Endgame tablebases
-- Python test suite for automated position validation
 
 ---
 
