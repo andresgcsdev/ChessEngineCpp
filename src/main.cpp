@@ -93,6 +93,7 @@ int main()
             else
             {
                 ui.println("Draw by stalemate!");
+                running = false;
             }
         }
     }
