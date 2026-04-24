@@ -565,7 +565,7 @@ bool Game::move(Coord from, Coord to)
 
 void Game::setHistory()
 {
-    SnapShot snap = SnapShot{board.snapshot(), gameState};
+    SnapShot snap = SnapShot{board.snapshot(), gameState, blackKing, whiteKing};
     history.push(snap);
 }
 
@@ -659,7 +659,7 @@ bool Game::hasMoves(Color c)
         {
             if (board.getPiece(Coord{i, j}).c == c && board.getPiece(Coord{i, j}).t != PieceType::BLANK)
             {
-                if (possibleMoves(Coord{i, j})[0] != Coord{8, 8})
+                if (isValidCoord(possibleMoves(Coord{i, j})[0]))
                     return true;
             }
         }
@@ -671,7 +671,7 @@ bool Game::hasMoves(Color c)
 bool Game::testForCheck(Coord from, Coord to)
 {
     // Saving current Board and Game State
-    SnapShot snap = SnapShot{board.snapshot(), gameState};
+    SnapShot snap = SnapShot{board.snapshot(), gameState, blackKing, whiteKing};
 
     Piece movingPiece = board.getPiece(from);
 
@@ -722,11 +722,12 @@ bool Game::staleMateByMaterial() const
     {
         for (int j = 0; j < 8; j++)
         {
-            if (board.getPiece(Coord{i, j}).t != PieceType::BLANK && board.getPiece(Coord{i, j}).t != PieceType::KING)
-                return true;
+            if (board.getPiece(Coord{i, j}).t != PieceType::BLANK)
+                if (board.getPiece(Coord{i, j}).t != PieceType::KING)
+                    return false;
         }
     }
 
-    return false;
+    return true;
 }
 
