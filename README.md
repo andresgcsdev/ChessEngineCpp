@@ -54,7 +54,8 @@ Comprehensive unit test suite covering:
 - **Common**: Coordinate/piece validation and equality operators
 - **UI**: Text-to-piece, text-to-coordinate, and piece-to-text transformations
 - **Board**: Initialization, matrix operations, piece lookup, move execution
-- **Game** (in progress): Move validation, check/checkmate detection, castling, en passant
+- **Game**: Move validation, check/checkmate detection, castling, en passant
+- **Engine**: Move validation for both colors
 
 ### Run Tests
 
