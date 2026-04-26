@@ -387,7 +387,7 @@ std::array<Coord, 27> Game::kingMoves(Coord p)
     return arr;
 }
 
-bool Game::isControlledBy(Coord sq, Color attacker)
+bool Game::isControlledBy(Coord sq, Color attacker) const
 {
     // Check for Knights
     int knightMoves[8][2] = {{-2, 1}, {-2, -1}, {2, 1}, {2, -1}, {1, -2}, {1, 2}, {-1, -2}, {-1, 2}};
@@ -439,7 +439,7 @@ bool Game::isControlledBy(Coord sq, Color attacker)
     // Check for Pawns
     // If we are looking for a WHITE attacker, the pawn must be BELOW the square (row - 1)
     // If we are looking for a BLACK attacker, the pawn must be ABOVE the square (row + 1)
-    int pawnRowDiff = (attacker == Color::WHITE) ? -1 : 1;
+    int pawnRowDiff = attacker == Color::WHITE ? 1 : -1;
     int pawnCols[2] = {sq.col - 1, sq.col + 1};
 
     for (int c: pawnCols)

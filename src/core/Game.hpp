@@ -106,7 +106,7 @@ private:
     void changeTurn();
 
     // Calculates if the square in the coordinate sq is being attacked by a piece of the specified color.
-    bool isControlledBy(Coord sq, Color attacker);
+    bool isControlledBy(Coord sq, Color attacker) const;
 
     // Returns true when move results in a check to the self king
     bool testForCheck(Coord from, Coord to);
