@@ -61,9 +61,10 @@ int Engine::minimax(Game &game, int depth, int alpha, int beta)
 
     bool isMaximizing = game.getTurn() == selfColor;
     int bestScore = isMaximizing ? INT_MIN : INT_MAX;
-    for (int row = 0; row < 8; row++)
+    bool alphaBetaCutoff = false;
+    for (int row = 0; row < 8 && !alphaBetaCutoff; row++)
     {
-        for (int col = 0; col < 8; col++)
+        for (int col = 0; col < 8 && !alphaBetaCutoff; col++)
         {
             Coord from = Coord{row, col};
             Piece p = game.getBoard().getPiece(from);
@@ -86,14 +87,20 @@ int Engine::minimax(Game &game, int depth, int alpha, int beta)
                     bestScore = std::max(bestScore, score);
                     alpha = std::max(alpha, bestScore);
                     if (beta <= alpha)
+                    {
+                        alphaBetaCutoff = true;
                         break;
+                    }
                 }
                 else
                 {
                     bestScore = std::min(bestScore, score);
                     beta = std::min(beta, bestScore);
                     if (beta <= alpha)
+                    {
+                        alphaBetaCutoff = true;
                         break;
+                    }
                 }
             }
         }
