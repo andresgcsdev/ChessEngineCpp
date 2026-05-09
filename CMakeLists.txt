@@ -12,7 +12,6 @@ add_executable(chess
     src/ui/ChessUI.cpp
     src/core/Engine.cpp
 )
-
 target_include_directories(chess PRIVATE src)
 
 # Test executable

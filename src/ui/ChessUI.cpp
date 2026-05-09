@@ -36,11 +36,11 @@ void ChessUI::printBoard(const Board &b, Color orientation) const
 
 std::string ChessUI::getInput() const
 {
-    std::string input = "";
+    std::string input;
     do
     {
         getline(std::cin, input);
-    } while (input == "");
+    } while (input.empty());
 
     return input;
 }

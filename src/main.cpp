@@ -13,7 +13,15 @@ int main()
 {
     Game g;
     ChessUI ui;
-    Engine engine(Color::BLACK);
+
+    ui.println("Welcome! Which color will you play as? (w for White and b for Black)");
+    std::string color = ui.getInput();
+    while (color[0] != 'w' && color[0] != 'b')
+        color = ui.getInput();
+
+    Color playerColor = color[0] == 'w'? Color::WHITE : Color::BLACK;
+
+    Engine engine(playerColor == Color::WHITE ? Color::BLACK : Color::WHITE);
     bool running = true;
     while (running)
     {
@@ -21,7 +29,7 @@ int main()
         if (g.hasMoves(g.getTurn()) && !g.staleMateByMaterial())
         {
             // Change this color value to WHITE to play as black.
-            if (g.getTurn() == Color::BLACK)
+            if (g.getTurn() != playerColor)
             {
                 // Depth higher than 3 is too slow as of now. Will implement better search in the future.
                 // Depth lower than 3 is instant, but plays pretty badly.
