@@ -136,6 +136,7 @@ This version is the result of all of that. Same problem, finally complete.
 
 ## Future Improvements
 
+- Move Ordering for Alpha-beta pruning
 - GUI implementation
 
 ---
