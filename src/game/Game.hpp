@@ -79,45 +79,12 @@ private:
     // Use only just before making a change on the board or game state.
     void setHistory();
 
-    // Returns an array of possible pawn moves of the given piece.
-    // Does not consider self king checks on the calculations.
-    // May return an emtpy array if the given coordinates aren't of a pawn.
-    std::array<Coord, 27> pawnMoves(Coord piece) const;
-
-    // Returns an array of possible rook moves of the given piece.
-    // Does not consider self king checks on the calculations.
-    // May return an emtpy array if the given coordinates aren't of a rook.
-    std::array<Coord, 27> rookMoves(Coord piece) const;
-
-    // Returns an array of possible knight moves of the given piece.
-    // Does not consider self king checks on the calculations.
-    // May return an emtpy array if the given coordinates aren't of a knight.
-    std::array<Coord, 27> knightMoves(Coord piece) const;
-
-    // Returns an array of possible bishop moves of the given piece.
-    // Does not consider self king checks on the calculations.
-    // May return an emtpy array if the given coordinates aren't of a bishop.
-    std::array<Coord, 27> bishopMoves(Coord piece) const;
-
-    // Returns an array of possible queen moves of the given piece.
-    // Does not consider self king checks on the calculations.
-    // May return an emtpy array if the given coordinates aren't of a queen.
-    std::array<Coord, 27> queenMoves(Coord piece) const;
-
-    // Returns an array of possible king moves of the given piece.
-    // Does not consider self king checks on the calculations.
-    // May return an emtpy array if the given coordinates aren't of a king.
-    std::array<Coord, 27> kingMoves(Coord piece);
-
     // Execute a move on the board. ASSUMES move has been validated by caller.
     // Does not check legality or if move leaves king in check.
     bool move(Coord from, Coord to);
 
     // Invert the turn.
     void changeTurn();
-
-    // Calculates if the square in the coordinate sq is being attacked by a piece of the specified color.
-    bool isControlledBy(Coord sq, Color attacker) const;
 
     // Returns true when move results in a check to the self king
     bool testForCheck(Coord from, Coord to);
