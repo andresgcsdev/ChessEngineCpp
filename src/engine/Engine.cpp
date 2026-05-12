@@ -36,8 +36,8 @@ std::array<Coord, 2> Engine::getBestMove(Game game)
                     if (posb[k] == Coord{8, 8})
                         break;
 
-                    SnapShot snap = game.getSnap();
                     game.applyMove(currentPiece, posb[k]);
+                    CheapSnap snap = game.getCheapSnap();
                     int minimaxVal = minimax(game, SEARCH_DEPTH, INT_MIN, INT_MAX);
                     game.revertState(snap);
 
@@ -78,8 +78,8 @@ int Engine::minimax(Game &game, int depth, int alpha, int beta)
                 if (posb[k] == Coord{8, 8})
                     break;
 
-                SnapShot snap = game.getSnap();
                 game.applyMove(from, posb[k]);
+                CheapSnap snap = game.getCheapSnap();
                 int score = minimax(game, depth - 1, alpha, beta);
                 game.revertState(snap);
 

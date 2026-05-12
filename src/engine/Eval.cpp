@@ -92,7 +92,7 @@ namespace
     //Piece Values
     static constexpr int PAWN_VALUE = 100;
     static constexpr int KNIGHT_VALUE = 300;
-    static constexpr int BISHOP_VALUE = 300;
+    static constexpr int BISHOP_VALUE = 350;
     static constexpr int ROOK_VALUE = 500;
     static constexpr int QUEEN_VALUE = 900;
 }
@@ -115,6 +115,8 @@ bool Eval::isEndgame(const Game &game)
                     material += 500;
                     break;
                 case PieceType::BISHOP:
+                    material += 300;
+                    break;
                 case PieceType::KNIGHT:
                     material += 300;
                     break;

@@ -58,7 +58,8 @@ enum class MoveType
     CAPTURE,
     ENPASSANT,
     CASTLING_KS,
-    CASTLING_QS
+    CASTLING_QS,
+    PROMOTION
 };
 
 struct MoveInfo

@@ -51,14 +51,14 @@ public:
     void revertState(const SnapShot &snap);
 
     // Reverts the board and game states to the SnapShot's.
-    // Overall state validity becomes the caller's responsibility.
-    // Use with getCheapSnap() to have predictable behavior.
+    // Only valid when passed the result of getCheapSnap() from the immediately preceding move.
+    // Behavior is undefined for arbitrary CheapSnap values.
     void revertState(const CheapSnap &snap);
 
     // Returns a SnapShot of current board and game states.
     SnapShot getSnap() const;
 
-    // Returns a CheapSnap of the current board and game states.
+    // Returns a CheapSnap of the current game state and previous move.
     CheapSnap getCheapSnap() const;
 
     // Returns a copy of the current game history.
@@ -73,7 +73,11 @@ private:
     GameState gameState;
     Coord blackKing;
     Coord whiteKing;
-    MoveInfo lastMove;
+
+    // Describes the previous state of the board.
+    // Used with getCheapSnap() and reverseState() to undo a move.
+    // Cheaper than using a full SnapShot of the board.
+    CheapSnap lastCheapSnap;
 
     // Takes a snapshot of the board, copies the current game state and adds it to the stack.
     // Use only just before making a change on the board or game state.

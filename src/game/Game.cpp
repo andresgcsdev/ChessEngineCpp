@@ -74,6 +74,18 @@ bool Game::move(Coord from, Coord to)
     if (movingPiece.t == PieceType::BLANK || movingPiece.t == PieceType::ERROR || !isValidCoord(to))
         return false;
 
+    lastCheapSnap.state = gameState;
+    lastCheapSnap.blackKing = blackKing;
+    lastCheapSnap.whiteKing = whiteKing;
+    lastCheapSnap.lastMove.from = from;
+    lastCheapSnap.lastMove.to = to;
+    lastCheapSnap.lastMove.captured = board.getPiece(to);
+
+    if (lastCheapSnap.lastMove.captured.t == PieceType::BLANK)
+        lastCheapSnap.lastMove.type = MoveType::QUIET;
+    else
+        lastCheapSnap.lastMove.type = MoveType::CAPTURE;
+
     if (movingPiece.t == PieceType::PAWN)
     {
         // Updating last en passant coordinates
@@ -86,8 +98,11 @@ bool Game::move(Coord from, Coord to)
         }
         else
         {
+
             if (to == gameState.enPassant)
             {
+                lastCheapSnap.lastMove.type = MoveType::ENPASSANT;
+                lastCheapSnap.lastMove.captured = board.getPiece(Coord{from.row, gameState.enPassant.col});
                 Coord removePawn = Coord{from.row, gameState.enPassant.col};
                 board.setPiece(removePawn, Piece{PieceType::BLANK, Color::BLACK, 'b'});
             }
@@ -100,6 +115,7 @@ bool Game::move(Coord from, Coord to)
             Piece promoted = movingPiece;
             promoted.t = PieceType::QUEEN;
             board.setPiece(to, promoted);
+            lastCheapSnap.lastMove.type = MoveType::PROMOTION;
         }
     }
     else
@@ -119,6 +135,7 @@ bool Game::move(Coord from, Coord to)
             // Setting king side rook to the right of the king
             if (to == Coord{from.row, from.col + 2})
             {
+                lastCheapSnap.lastMove.type = MoveType::CASTLING_KS;
                 Piece rookKingSide = Piece{PieceType::ROOK, movingPiece.c, '2'};
                 board.setPiece(Coord{from.row, from.col + 1}, rookKingSide);
 
@@ -128,6 +145,7 @@ bool Game::move(Coord from, Coord to)
             // Setting queen side rook to the left of the king
             else if (to == Coord{from.row, from.col - 2})
             {
+                lastCheapSnap.lastMove.type = MoveType::CASTLING_QS;
                 Piece rookKingSide = Piece{PieceType::ROOK, movingPiece.c, '1'};
                 board.setPiece(Coord{from.row, from.col - 1}, rookKingSide);
 
@@ -164,14 +182,6 @@ void Game::setHistory()
 {
     SnapShot snap = SnapShot{board.snapshot(), gameState, blackKing, whiteKing};
     history.push(snap);
-}
-
-void Game::revertState(const SnapShot &snap)
-{
-    gameState = snap.state;
-    board.setMatrix(snap.board);
-    blackKing = snap.blackKing;
-    whiteKing = snap.whiteKing;
 }
 
 bool Game::isKingInCheck(Color c)
@@ -234,17 +244,19 @@ bool Game::hasMoves(Color c)
 
 bool Game::testForCheck(Coord from, Coord to)
 {
-    // Saving current Board and Game State
-    SnapShot snap = SnapShot{board.snapshot(), gameState, blackKing, whiteKing};
-
+    // Save moving piece's color before move (since it may be overwritten)
     Piece movingPiece = board.getPiece(from);
+    Color moverColor = movingPiece.c;
 
-    // Making the move
+    // Perform the move - this populates lastCheapSnap automatically
     move(from, to);
 
-    // Finding if in check
-    bool check = isKingInCheck(movingPiece.c);
+    // Grab the cheap snapshot (pre-move state)
+    CheapSnap snap = getCheapSnap();
 
+    bool check = isKingInCheck(moverColor);
+
+    // Revert using the cheap snapshot
     revertState(snap);
 
     return check;
@@ -270,9 +282,74 @@ void Game::undo()
     gameState = snap.state;
 }
 
+void Game::revertState(const SnapShot &snap)
+{
+    gameState = snap.state;
+    board.setMatrix(snap.board);
+    blackKing = snap.blackKing;
+    whiteKing = snap.whiteKing;
+}
+
 SnapShot Game::getSnap() const
 {
     return SnapShot{board.snapshot(), gameState, blackKing, whiteKing};
+}
+
+void Game::revertState(const CheapSnap &snap)
+{
+    gameState = snap.state;
+    blackKing = snap.blackKing;
+    whiteKing = snap.whiteKing;
+
+    const MoveInfo& lastMove = snap.lastMove;
+    const Piece moved = board.getPiece(lastMove.to);
+
+    if (lastMove.type == MoveType::PROMOTION)
+    {
+        const Piece originalPawn = {PieceType::PAWN, moved.c, moved.id};
+        board.setPiece(lastMove.from, originalPawn);
+        board.setPiece(lastMove.to, lastMove.captured);
+    }
+
+    if (lastMove.type == MoveType::QUIET || lastMove.type == MoveType::CAPTURE)
+    {
+        board.setPiece(lastMove.from, moved);
+        board.setPiece(lastMove.to, lastMove.captured);
+    }
+
+    if (lastMove.type == MoveType::ENPASSANT)
+    {
+        board.setPiece(lastMove.from, moved);
+        const Coord capturedPawnCoord = {lastMove.from.row, lastMove.to.col};
+        board.setPiece(capturedPawnCoord, lastMove.captured);
+        board.setPiece(lastMove.to, Piece{PieceType::BLANK, Color::BLACK, 'b'});
+    }
+
+    if (lastMove.type == MoveType::CASTLING_KS)
+    {
+        board.setPiece(lastMove.from, moved);
+        board.setPiece(lastMove.to, lastMove.captured);
+        const Coord initialRookCoord = {lastMove.to.row, lastMove.to.col - 1};
+        const Piece rook = board.getPiece(initialRookCoord);
+        board.setPiece(initialRookCoord, Piece{PieceType::BLANK, Color::BLACK, 'b'});
+        const Coord finalRookCoord = {lastMove.to.row, lastMove.to.col + 1};
+        board.setPiece(finalRookCoord, rook);
+    }
+    if (lastMove.type == MoveType::CASTLING_QS)
+    {
+        board.setPiece(lastMove.from, moved);
+        board.setPiece(lastMove.to, lastMove.captured);
+        const Coord initialRookCoord = {lastMove.to.row, lastMove.to.col + 1};
+        const Piece rook = board.getPiece(initialRookCoord);
+        board.setPiece(initialRookCoord, Piece{PieceType::BLANK, Color::BLACK, 'b'});
+        const Coord finalRookCoord = {lastMove.to.row, lastMove.to.col - 2};
+        board.setPiece(finalRookCoord, rook);
+    }
+}
+
+CheapSnap Game::getCheapSnap() const
+{
+    return lastCheapSnap;
 }
 
 std::stack<SnapShot> Game::getHistory() const
@@ -294,6 +371,4 @@ bool Game::staleMateByMaterial() const
 
     return true;
 }
-
-// TODO: Implement getCheapSnap() and revertState(const CheapSnap & snap);
 
