@@ -32,7 +32,7 @@ public:
     // Returns an array of all possible moves the piece can make from the given position.
     // Possible moves are the ones that follow chess rules and do not result on checks of oneself's king.
     // Returns an array of invalid positions if no moves are available for that piece.
-    std::array<Coord, 27> possibleMoves(Coord piece);
+    std::array<Coord, 27> possibleMoves(const Coord& piece);
 
     // True if king of color `c` is in check, False otherwise.
     bool isKingInCheck(Color c);
