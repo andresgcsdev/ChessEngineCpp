@@ -1,8 +1,8 @@
-#include "core/Game.hpp"
-#include "core/Board.hpp"
-#include "core/Common.hpp"
+#include "game/Game.hpp"
+#include "board/Board.hpp"
+#include "types/Common.hpp"
 #include "ui/ChessUI.hpp"
-#include "core/Engine.hpp"
+#include "engine/Engine.hpp"
 #include <array>
 
 // Code by André Santos

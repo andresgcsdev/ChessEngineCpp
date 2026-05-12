@@ -1,8 +1,8 @@
 #include <array>
 #include <stack>
-#include "Game.hpp"
-#include "Board.hpp"
-#include "Common.hpp"
+#include "../game/Game.hpp"
+#include "../board/Board.hpp"
+#include "../types/Common.hpp"
 
 Game::Game()
 {
@@ -730,4 +730,6 @@ bool Game::staleMateByMaterial() const
 
     return true;
 }
+
+// TODO: Reorganize functions in this file, they're scattered around senselessly; Implement getCheapSnap() and revertState(const CheapSnap & snap);
 

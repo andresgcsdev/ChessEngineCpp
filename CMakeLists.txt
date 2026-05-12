@@ -6,20 +6,20 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Main game executable
 add_executable(chess
-    src/main.cpp
-    src/core/Board.cpp
-    src/core/Game.cpp
-    src/ui/ChessUI.cpp
-    src/core/Engine.cpp
+        src/main.cpp
+        src/board/Board.cpp
+        src/game/Game.cpp
+        src/ui/ChessUI.cpp
+        src/engine/Engine.cpp
 )
 target_include_directories(chess PRIVATE src)
 
 # Test executable
 add_executable(chess_test
         test/mainTest.cpp
-        src/core/Board.cpp
-        src/core/Game.cpp
-        src/core/Engine.cpp
+        src/board/Board.cpp
+        src/game/Game.cpp
+        src/engine/Engine.cpp
         src/ui/ChessUI.cpp
         test/commonTest.hpp
         test/chessUITest.hpp

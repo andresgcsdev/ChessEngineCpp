@@ -1,8 +1,8 @@
 #pragma once
 #include <array>
 #include <stack>
-#include "Board.hpp"
-#include "Common.hpp"
+#include "../board/Board.hpp"
+#include "../types/Common.hpp"
 
 // Controller Class.
 // Manages all chess logic, rules, and game state.
@@ -46,10 +46,20 @@ public:
     void undo();
 
     // Reverts the board and game states to the SnapShot's.
+    // Overall state validity becomes the caller's responsibility.
+    // Use with getSnap() to have predictable behavior.
     void revertState(const SnapShot &snap);
+
+    // Reverts the board and game states to the SnapShot's.
+    // Overall state validity becomes the caller's responsibility.
+    // Use with getCheapSnap() to have predictable behavior.
+    void revertState(const CheapSnap &snap);
 
     // Returns a SnapShot of current board and game states.
     SnapShot getSnap() const;
+
+    // Returns a CheapSnap of the current board and game states.
+    CheapSnap getCheapSnap() const;
 
     // Returns a copy of the current game history.
     std::stack<SnapShot> getHistory() const;
@@ -63,6 +73,7 @@ private:
     GameState gameState;
     Coord blackKing;
     Coord whiteKing;
+    MoveInfo lastMove;
 
     // Takes a snapshot of the board, copies the current game state and adds it to the stack.
     // Use only just before making a change on the board or game state.

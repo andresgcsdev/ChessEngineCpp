@@ -2,7 +2,7 @@
 
 #include <array>
 #include <iostream>
-#include "core/Common.hpp"
+#include "../src/types/Common.hpp"
 #include "ui/ChessUI.hpp"
 
 // Main UI test routine.

@@ -2,8 +2,8 @@
 
 #include <iostream>
 #include <array>
-#include "core/Common.hpp"
-#include "core/Game.hpp"
+#include "../src/types/Common.hpp"
+#include "../src/game/Game.hpp"
 #include "testHelper.hpp"
 
 // SnapShot copying test routine.

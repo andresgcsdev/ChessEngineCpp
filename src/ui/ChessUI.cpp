@@ -2,7 +2,7 @@
 #include <string>
 #include <iostream>
 #include "ChessUI.hpp"
-#include "core/Board.hpp"
+#include "../board/Board.hpp"
 
 void ChessUI::printBoard(const Board &b, Color orientation) const
 {

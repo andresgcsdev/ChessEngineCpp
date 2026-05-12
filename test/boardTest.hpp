@@ -2,8 +2,8 @@
 
 #include <iostream>
 #include <array>
-#include "core/Common.hpp"
-#include "core/Board.hpp"
+#include "../src/types/Common.hpp"
+#include "../src/board/Board.hpp"
 #include "testHelper.hpp"
 
 // Main Board class test routine function.

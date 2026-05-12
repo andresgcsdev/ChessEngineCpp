@@ -1,6 +1,6 @@
 #include <array>
-#include "Common.hpp"
-#include "Board.hpp"
+#include "../types/Common.hpp"
+#include "../board/Board.hpp"
 
 void Board::move(const Coord from, const Coord to)
 {

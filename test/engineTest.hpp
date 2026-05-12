@@ -1,8 +1,8 @@
 #pragma once
 
-#include "core/Common.hpp"
-#include "core/Engine.hpp"
-#include "core/Game.hpp"
+#include "../src/types/Common.hpp"
+#include "../src/engine/Engine.hpp"
+#include "../src/game/Game.hpp"
 
 // Main Engine test routine.
 int runEngineTests()

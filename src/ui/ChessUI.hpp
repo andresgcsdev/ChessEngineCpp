@@ -2,7 +2,7 @@
 #include <array>
 #include <string>
 #include <iostream>
-#include "core/Board.hpp"
+#include "../board/Board.hpp"
 
 // View Class.
 // Handles all user input and output.

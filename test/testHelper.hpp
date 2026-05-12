@@ -3,8 +3,8 @@
 #include <iostream>
 #include <array>
 #include <cctype>
-#include "core/Common.hpp"
-#include "core/Board.hpp"
+#include "../src/types/Common.hpp"
+#include "../src/board/Board.hpp"
 #include "ui/ChessUI.hpp"
 
 constexpr GameState defaultGameState = GameState{Color::WHITE, {{true, true}, {true, true}}, Coord{8, 8}};

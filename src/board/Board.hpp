@@ -1,6 +1,6 @@
 #pragma once
 #include <array>
-#include "Common.hpp"
+#include "../types/Common.hpp"
 
 // Model Class.
 // Wrapper for accessing the 8x8 Matrix.
