@@ -80,11 +80,13 @@ int runCommonTests()
     else
     {
         std::cout << "        ERROR on case 1" << std::endl;
+        ERROR_COUNT++;
     }
 
     if (pieceComparisons[0] == pieceComparisons[2])
     {
         std::cout << "        ERROR on case 2" << std::endl;
+        ERROR_COUNT++;
     }
     else
     {
@@ -94,6 +96,7 @@ int runCommonTests()
     if (pieceComparisons[0] == pieceComparisons[3])
     {
         std::cout << "        ERROR on case 3" << std::endl;
+        ERROR_COUNT++;
     }
     else
     {
