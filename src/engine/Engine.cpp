@@ -5,6 +5,7 @@
 #include "../board/Board.hpp"
 #include "../types/Common.hpp"
 #include "../engine/Engine.hpp"
+#include "Eval.hpp"
 
 Engine::Engine(Color c)
 {
@@ -57,7 +58,7 @@ std::array<Coord, 2> Engine::getBestMove(Game game)
 int Engine::minimax(Game &game, int depth, int alpha, int beta)
 {
     if (depth == 0)
-        return evaluate(game);
+        return Eval::evaluate(game, selfColor);
 
     bool isMaximizing = game.getTurn() == selfColor;
     int bestScore = isMaximizing ? INT_MIN : INT_MAX;
@@ -106,134 +107,4 @@ int Engine::minimax(Game &game, int depth, int alpha, int beta)
         }
     }
     return bestScore;
-}
-
-bool Engine::isEndgame(const Game &game) const
-{
-    // Count non-pawn, non-king material
-    int material = 0;
-    for (int i = 0; i < 8; i++)
-    {
-        for (int j = 0; j < 8; j++)
-        {
-            Piece p = game.getBoard().getPiece(Coord{i, j});
-            switch (p.t)
-            {
-                case PieceType::QUEEN:
-                    material += 900;
-                    break;
-                case PieceType::ROOK:
-                    material += 500;
-                    break;
-                case PieceType::BISHOP:
-                case PieceType::KNIGHT:
-                    material += 300;
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    // Endgame if material is low (no queens, few pieces)
-    return material < 1000;
-}
-
-int Engine::evaluate(Game &game) const
-{
-    if (!game.hasMoves(game.getTurn()))
-    {
-        if (game.isKingInCheck(game.getTurn()))
-            // Checkmate
-            // Always avoids getting checkmated, always goes for checkmate on the enemy.
-            return game.getTurn() == selfColor ? INT_MIN : INT_MAX;
-        // Stalemate
-        // Always discourage Stalemate, but will go for it if it's the only option
-        return -50;
-    }
-    int score = 0;
-    int whiteMultiplr = selfColor == Color::WHITE ? 1 : -1;
-    for (int row = 0; row < 8; row++)
-    {
-        for (int col = 0; col < 8; col++)
-        {
-            Coord from = Coord{row, col};
-            Piece p = game.getBoard().getPiece(from);
-            if (p.t == PieceType::BLANK)
-                continue;
-            int val = 0;
-            int fixedRow = p.c == Color::WHITE ? 7 - row: row;
-            switch (p.t)
-            {
-                case PieceType::PAWN:
-
-                    val += PAWN_VALUE;
-                    val += pawnTable[fixedRow][col];
-
-                    if (p.c == Color::WHITE)
-                        val *= whiteMultiplr;
-                    else
-                        val *= -whiteMultiplr;
-                    break;
-
-                case PieceType::ROOK:
-
-                    val += ROOK_VALUE;
-                    val += rookTable[fixedRow][col];
-
-                    if (p.c == Color::WHITE)
-                        val *= whiteMultiplr;
-                    else
-                        val *= -whiteMultiplr;
-                    break;
-                case PieceType::KNIGHT:
-
-                    val += KNIGHT_VALUE;
-                    val += knightTable[fixedRow][col];
-
-                    if (p.c == Color::WHITE)
-                        val *= whiteMultiplr;
-                    else
-                        val *= -whiteMultiplr;
-                    break;
-                case PieceType::BISHOP:
-
-                    val += BISHOP_VALUE;
-                    val += bishopTable[fixedRow][col];
-
-                    if (p.c == Color::WHITE)
-                        val *= whiteMultiplr;
-                    else
-                        val *= -whiteMultiplr;
-                    break;
-                case PieceType::QUEEN:
-
-                    val += QUEEN_VALUE;
-                    val += queenTable[fixedRow][col];
-
-                    if (p.c == Color::WHITE)
-                        val *= whiteMultiplr;
-                    else
-                        val *= -whiteMultiplr;
-                    break;
-                case PieceType::KING:
-                    if (isEndgame(game))
-                        val += kingEndgameTable[fixedRow][col];
-                    else
-                        val += kingTable[fixedRow][col];
-
-                    if (p.c == Color::WHITE)
-                        val *= whiteMultiplr;
-                    else
-                        val *= -whiteMultiplr;
-                    break;
-                default:
-                    break;
-            }
-
-            score += val;
-        }
-    }
-
-    return score;
 }

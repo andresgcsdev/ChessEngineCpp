@@ -12,6 +12,8 @@ add_executable(chess
         src/ui/ChessUI.cpp
         src/engine/Engine.cpp
         src/movegen/MoveGenerator.cpp
+        src/engine/Eval.cpp
+        src/engine/Eval.hpp
 )
 target_include_directories(chess PRIVATE src)
 
@@ -22,6 +24,7 @@ add_executable(chess_test
         src/movegen/MoveGenerator.cpp
         src/game/Game.cpp
         src/engine/Engine.cpp
+        src/engine/Eval.cpp
         src/ui/ChessUI.cpp
         test/commonTest.hpp
         test/chessUITest.hpp
