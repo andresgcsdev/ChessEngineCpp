@@ -27,7 +27,7 @@ int main()
     ERROR_COUNT += runEngineTests();
 
     std::cout << "================================" << std::endl;
-    std::cout << "Test Summary: " << ERROR_COUNT << " error(s) out of 174 tests" << std::endl;
+    std::cout << "Test Summary: " << ERROR_COUNT << " error(s) out of 178 tests" << std::endl;
     if (ERROR_COUNT == 0)
         std::cout << "All systems nominal. You don't need to thank me." << std::endl;
     else

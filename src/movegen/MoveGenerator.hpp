@@ -20,4 +20,12 @@ namespace MoveGenerator
         const Coord &at,
         Color attacker
     );
+
+    // Classifies the possible move based on the given piece displacement.
+    MoveInfo classifyMove(
+        const Board& board,
+        const GameState& gameState,
+        Coord from,
+        Coord to
+    );
 }

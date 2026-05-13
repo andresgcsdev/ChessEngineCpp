@@ -6,7 +6,7 @@ namespace
 {
     // All position value tables
     // Pawn
-    static constexpr int pawnTable[8][8] = {
+    constexpr int pawnTable[8][8] = {
             {0, 0, 0, 0, 0, 0, 0, 0}, // Rank 1
             {5, 5, 5, 5, 5, 5, 5, 5}, // Rank 2
             {10, 10, 10, 10, 10, 10, 10, 10}, // Rank 3
@@ -18,7 +18,7 @@ namespace
             };
 
     // Knight
-    static constexpr int knightTable[8][8] = {
+    constexpr int knightTable[8][8] = {
             {-50, -40, -30, -30, -30, -30, -40, -50},
             {-40, -20, 0, 0, 0, 0, -20, -40},
             {-30, 0, 10, 15, 15, 10, 0, -30},
@@ -30,7 +30,7 @@ namespace
             };
 
     // Bishop
-    static constexpr int bishopTable[8][8] = {
+    constexpr int bishopTable[8][8] = {
             {-20, -10, -10, -10, -10, -10, -10, -20},
             {-10, 0, 0, 0, 0, 0, 0, -10},
             {-10, 0, 5, 10, 10, 5, 0, -10},
@@ -42,7 +42,7 @@ namespace
             };
 
     // Rook
-    static constexpr int rookTable[8][8] = {
+    constexpr int rookTable[8][8] = {
             {0, 0, 0, 0, 0, 0, 0, 0},
             {5, 10, 10, 10, 10, 10, 10, 5},
             {-5, 0, 0, 0, 0, 0, 0, -5},
@@ -54,7 +54,7 @@ namespace
             };
 
     // Queen
-    static constexpr int queenTable[8][8] = {
+    constexpr int queenTable[8][8] = {
             {-20, -10, -10, -5, -5, -10, -10, -20},
             {-10, 0, 0, 0, 0, 0, 0, -10},
             {-10, 0, 5, 5, 5, 5, 0, -10},
@@ -66,7 +66,7 @@ namespace
             };
 
     // King (opening/midgame)
-    static constexpr int kingTable[8][8] = {
+    constexpr int kingTable[8][8] = {
             {-30, -40, -40, -50, -50, -40, -40, -30},
             {-30, -40, -40, -50, -50, -40, -40, -30},
             {-30, -40, -40, -50, -50, -40, -40, -30},
@@ -78,7 +78,7 @@ namespace
             };
 
     // King (endgame)
-    static constexpr int kingEndgameTable[8][8] = {
+    constexpr int kingEndgameTable[8][8] = {
             {-50, -40, -30, -20, -20, -30, -40, -50},
             {-40, -20, 0, 10, 10, 0, -20, -40},
             {-30, 0, 20, 30, 30, 20, 0, -30},
@@ -90,11 +90,34 @@ namespace
             };
 
     //Piece Values
-    static constexpr int PAWN_VALUE = 100;
-    static constexpr int KNIGHT_VALUE = 300;
-    static constexpr int BISHOP_VALUE = 350;
-    static constexpr int ROOK_VALUE = 500;
-    static constexpr int QUEEN_VALUE = 900;
+    constexpr int PAWN_VALUE = 100;
+    constexpr int KNIGHT_VALUE = 300;
+    constexpr int BISHOP_VALUE = 350;
+    constexpr int ROOK_VALUE = 500;
+    constexpr int QUEEN_VALUE = 900;
+    constexpr int KING_VALUE = 1000;
+
+    int pieceValue(const PieceType &p)
+    {
+        switch (p)
+        {
+            case PieceType::KING:
+                return KING_VALUE;
+            case PieceType::QUEEN:
+                return QUEEN_VALUE;
+            case PieceType::ROOK:
+                return ROOK_VALUE;
+            case PieceType::BISHOP:
+                return BISHOP_VALUE;
+            case PieceType::KNIGHT:
+                return KNIGHT_VALUE;
+            case PieceType::PAWN:
+                return PAWN_VALUE;
+            default:
+                break;
+        }
+        return 0;
+    }
 }
 
 bool Eval::isEndgame(const Game &game)
@@ -109,16 +132,16 @@ bool Eval::isEndgame(const Game &game)
             switch (p.t)
             {
                 case PieceType::QUEEN:
-                    material += 900;
+                    material += QUEEN_VALUE;
                     break;
                 case PieceType::ROOK:
-                    material += 500;
+                    material += ROOK_VALUE;
                     break;
                 case PieceType::BISHOP:
-                    material += 300;
+                    material += BISHOP_VALUE;
                     break;
                 case PieceType::KNIGHT:
-                    material += 300;
+                    material += KNIGHT_VALUE;
                     break;
                 default:
                     break;
@@ -227,4 +250,16 @@ int Eval::evaluate(Game &game, const Color &selfColor)
     }
 
     return score;
+}
+
+int moveScore(const MoveInfo& move, const Board& board) {
+    if (move.type == MoveType::PROMOTION)
+        return 200'000 + QUEEN_VALUE;
+
+    if (move.type == MoveType::CAPTURE || move.type == MoveType::ENPASSANT) {
+        int victim  = pieceValue(move.captured.t);
+        int attacker = pieceValue(board.getPiece(move.from).t);
+        return 100'000 + victim * 100 - attacker;
+    }
+    return 0;
 }

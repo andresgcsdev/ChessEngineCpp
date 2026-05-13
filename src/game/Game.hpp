@@ -67,6 +67,8 @@ public:
     // Returns true when there are only kings on the board.
     bool staleMateByMaterial() const;
 
+    GameState getCurrentState() const;
+
 private:
     std::stack<SnapShot> history;
     Board board;

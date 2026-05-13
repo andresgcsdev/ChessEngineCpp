@@ -56,6 +56,11 @@ Board Game::getBoard() const
     return board;
 }
 
+GameState Game::getCurrentState() const
+{
+    return gameState;
+}
+
 Color Game::getTurn() const
 {
     return gameState.turn;

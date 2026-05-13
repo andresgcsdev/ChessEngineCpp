@@ -4,6 +4,7 @@
 #include <array>
 #include "../src/types/Common.hpp"
 #include "../src/game/Game.hpp"
+#include "movegen/MoveGenerator.hpp"
 #include "testHelper.hpp"
 
 // SnapShot copying test routine.
@@ -263,10 +264,10 @@ void testRookMoveGen(int &ERROR_COUNT, Game &g)
     testSnap.state.turn = Color::WHITE;
     g.revertState(testSnap);
     constexpr std::array<Coord, 9> expectedWhiteRook = {
-        Coord{4, 3}, Coord{4, 2}, Coord{4, 1}, // Left
-        Coord{3, 4}, Coord{2, 4}, Coord{1, 4}, Coord{0, 4}, // Up
-        Coord{5, 4}, Coord{6, 4} // Down
-    };
+            Coord{4, 3}, Coord{4, 2}, Coord{4, 1}, // Left
+            Coord{3, 4}, Coord{2, 4}, Coord{1, 4}, Coord{0, 4}, // Up
+            Coord{5, 4}, Coord{6, 4} // Down
+            };
     if (validateMoves(g.possibleMoves(Coord{4, 4}), expectedWhiteRook))
     {
         std::cout << "        SUCCESS on case 1." << std::endl;
@@ -282,10 +283,10 @@ void testRookMoveGen(int &ERROR_COUNT, Game &g)
     testSnap.state.turn = Color::BLACK;
     g.revertState(testSnap);
     constexpr std::array<Coord, 9> expectedBlackRook = {
-        Coord{4, 3}, Coord{4, 2}, Coord{4, 1}, // Left
-        Coord{3, 4}, Coord{2, 4}, Coord{1, 4}, Coord{0, 4}, // Up
-        Coord{5, 4}, Coord{6, 4} // Down
-    };
+            Coord{4, 3}, Coord{4, 2}, Coord{4, 1}, // Left
+            Coord{3, 4}, Coord{2, 4}, Coord{1, 4}, Coord{0, 4}, // Up
+            Coord{5, 4}, Coord{6, 4} // Down
+            };
     if (validateMoves(g.possibleMoves(Coord{4, 4}), expectedBlackRook))
     {
         std::cout << "        SUCCESS on case 2." << std::endl;
@@ -309,10 +310,10 @@ void testBishopMoveGen(int &ERROR_COUNT, Game &g)
     testSnap.state.turn = Color::WHITE;
     g.revertState(testSnap);
     constexpr std::array<Coord, 5> expectedWhiteBishop = {
-        Coord{3, 2}, Coord{2, 1}, // North-West
-        Coord{5, 4}, Coord{6, 5}, // South-East
-        Coord{5, 2} // South-WEST
-    };
+            Coord{3, 2}, Coord{2, 1}, // North-West
+            Coord{5, 4}, Coord{6, 5}, // South-East
+            Coord{5, 2} // South-WEST
+            };
     if (validateMoves(g.possibleMoves(Coord{4, 3}), expectedWhiteBishop))
     {
         std::cout << "        SUCCESS on case 1." << std::endl;
@@ -328,10 +329,10 @@ void testBishopMoveGen(int &ERROR_COUNT, Game &g)
     testSnap.state.turn = Color::BLACK;
     g.revertState(testSnap);
     constexpr std::array<Coord, 5> expectedBlackBishop = {
-        Coord{3, 2}, Coord{2, 1}, // North-West
-        Coord{5, 4}, Coord{6, 5}, // South-East
-        Coord{5, 2} // South-WEST
-    };
+            Coord{3, 2}, Coord{2, 1}, // North-West
+            Coord{5, 4}, Coord{6, 5}, // South-East
+            Coord{5, 2} // South-WEST
+            };
     if (validateMoves(g.possibleMoves(Coord{4, 3}), expectedBlackBishop))
     {
         std::cout << "        SUCCESS on case 2." << std::endl;
@@ -453,9 +454,9 @@ void testKingMoveGen(int &ERROR_COUNT, Game &g)
     testSnap.state.turn = Color::WHITE;
     g.revertState(testSnap);
     constexpr std::array<Coord, 9> expectedWhiteKing = {
-        Coord{5, 3}, Coord{5, 2}, Coord{3, 3}, Coord{3, 4},
-        Coord{3, 2}, Coord{4, 4}, Coord{4, 2}, Coord{4, 1}, Coord{4, 5}
-    };
+            Coord{5, 3}, Coord{5, 2}, Coord{3, 3}, Coord{3, 4},
+            Coord{3, 2}, Coord{4, 4}, Coord{4, 2}, Coord{4, 1}, Coord{4, 5}
+            };
     if (validateMoves(g.possibleMoves(Coord{4, 3}), expectedWhiteKing))
     {
         std::cout << "        SUCCESS on case 1." << std::endl;
@@ -471,9 +472,9 @@ void testKingMoveGen(int &ERROR_COUNT, Game &g)
     testSnap.state.turn = Color::BLACK;
     g.revertState(testSnap);
     constexpr std::array<Coord, 9> expectedBlackKing = {
-        Coord{5, 3}, Coord{5, 2}, Coord{3, 3}, Coord{3, 4},
-        Coord{3, 2}, Coord{4, 4}, Coord{4, 2}, Coord{4, 1}, Coord{4, 5}
-    };
+            Coord{5, 3}, Coord{5, 2}, Coord{3, 3}, Coord{3, 4},
+            Coord{3, 2}, Coord{4, 4}, Coord{4, 2}, Coord{4, 1}, Coord{4, 5}
+            };
     if (validateMoves(g.possibleMoves(Coord{4, 3}), expectedBlackKing))
     {
         std::cout << "        SUCCESS on case 2." << std::endl;
@@ -1173,6 +1174,46 @@ void testStalemate(int &ERROR_COUNT, Game &g)
     }
 }
 
+int testMoveClassifier(int ERROR_COUNT, Game &g)
+{
+    std::cout << "    Move classifier:" << std::endl;
+    SnapShot testSnap;
+    testSnap.board = FEN_to_matrix("8/8/8/3r4/8/3Q4/8/8");
+    testSnap.state = defaultGameState;
+    testSnap.blackKing = Coord{8, 8};
+    testSnap.whiteKing = Coord{8, 8};
+    g.revertState(testSnap);
+    std::array<Coord, 27> arr = g.possibleMoves({5, 3});
+    for (int i = 0; i < 4; i++)
+    {
+        if (i == 3)
+        {
+            if (MoveGenerator::classifyMove(g.getBoard(), testSnap.state, {5, 3}, arr[i]).type == MoveType::CAPTURE)
+            {
+                std::cout << "        SUCCESS on case " << i << std::endl;
+            }
+            else
+            {
+                std::cout << "        ERROR on case " << i << std::endl;
+                ERROR_COUNT++;
+            }
+        }
+        else
+        {
+            if (MoveGenerator::classifyMove(g.getBoard(), testSnap.state, {5, 3}, arr[i]).type == MoveType::QUIET)
+            {
+                std::cout << "        SUCCESS on case " << i << std::endl;
+            }
+            else
+            {
+                std::cout << "        ERROR on case " << i << std::endl;
+                ERROR_COUNT++;
+            }
+        }
+    }
+    return ERROR_COUNT;
+}
+
 // Main Game class test routine function.
 int runGameTests()
 {
@@ -1192,6 +1233,7 @@ int runGameTests()
     testMoveExec(ERROR_COUNT, g);
     testHasMoves(ERROR_COUNT, g);
     testStalemate(ERROR_COUNT, g);
+    testMoveClassifier(ERROR_COUNT, g);
 
     return ERROR_COUNT;
 }

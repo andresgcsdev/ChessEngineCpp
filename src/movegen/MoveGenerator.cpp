@@ -416,3 +416,50 @@ bool MoveGenerator::isSquareAttackedBy(const Board &board, const Coord &at, Colo
 
     return false;
 }
+
+MoveInfo MoveGenerator::classifyMove(const Board &board, const GameState &gameState, Coord from, Coord to)
+{
+    MoveInfo move;
+    move.from = from;
+    move.to = to;
+    move.captured = board.getPiece(to);
+    // If no match, move is QUIET.
+    move.type = MoveType::QUIET;
+    Piece movingPiece = board.getPiece(from);
+
+    // Capture check.
+    if (move.captured.t != PieceType::BLANK)
+    {
+        move.type = MoveType::CAPTURE;
+    }
+
+    // En passant and promotion check.
+    if (movingPiece.t == PieceType::PAWN)
+    {
+        if (to == gameState.enPassant)
+        {
+            move.type = MoveType::ENPASSANT;
+            move.captured = board.getPiece(Coord{from.row, to.col});
+        }
+
+        if ((movingPiece.c == Color::WHITE && to.row == 0) ||
+            (movingPiece.c == Color::BLACK && to.row == 7))
+        {
+            move.type = MoveType::PROMOTION;
+        }
+    }
+    // Castling check.
+    if (movingPiece.t == PieceType::KING)
+    {
+        if (to == Coord{from.row, from.col - 2})
+        {
+            move.type = MoveType::CASTLING_QS;
+        }
+        else if (to == Coord{from.row, from.col + 2})
+        {
+            move.type = MoveType::CASTLING_KS;
+        }
+    }
+
+    return move;
+}

@@ -1,5 +1,7 @@
 #pragma once
 #include <array>
+#include <vector>
+
 #include "../game/Game.hpp"
 #include "../board/Board.hpp"
 #include "../types/Common.hpp"
@@ -11,19 +13,28 @@
 class Engine
 {
 public:
-    // `Color c` is the color that the Engine will evaluate for (positive multipliers for evaluation).
-    Engine(Color c);
 
     // Evaluates what is the next best move for the engine.
     // Returns an array of coords, index 0 is `from` and index 1 is `to`.
     // May return an Out-of-bounds coord array if the turn doesn't match the Engine color.
-    std::array<Coord, 2> getBestMove(Game game);
+    std::array<Coord, 2> getBestMove(Game game, const Color &selfColor);
 
 private:
     static constexpr int SEARCH_DEPTH = 4;
-    Color selfColor;
 
     // Minimax function for interation through moves.
     // Includes Alpha-Beta pruning.
-    int minimax(Game &game, int depth, int alpha, int beta);
+    static int minimax(Game &game, int depth, int alpha, int beta, const Color &selfColor);
+
+    // Returns a vector of all possible moves on the board.
+    static std::vector<MoveInfo> getAllMoveInfo(Game &game, const Color &selfColor);
+
+    // Sorts a MoveInfo vector by MVV-LVA.
+    // Returns a sorted vector of the pair moves + their score.
+    static std::vector<std::pair<MoveInfo, int>> sortMoveInfo(const std::vector<MoveInfo> &moves, const Board &board);
+
+    static bool compareMoves(const std::pair<MoveInfo, int>& a, const std::pair<MoveInfo, int>& b) {
+        return a.second > b.second;
+    }
+
 };

@@ -21,7 +21,7 @@ int main()
 
     Color playerColor = color[0] == 'w'? Color::WHITE : Color::BLACK;
 
-    Engine engine(playerColor == Color::WHITE ? Color::BLACK : Color::WHITE);
+    Engine engine;
     bool running = true;
     while (running)
     {
@@ -33,7 +33,7 @@ int main()
             {
                 // Depth higher than 4 is too slow as of now. Will implement better search in the future.
                 // Depth lower than 4 is instant, but plays pretty badly.
-                std::array<Coord, 2> bestMove = engine.getBestMove(g);
+                std::array<Coord, 2> bestMove = engine.getBestMove(g, playerColor == Color::WHITE ? Color::BLACK : Color::WHITE);
                 g.makeMove(bestMove[0], bestMove[1]);
             }
             else
