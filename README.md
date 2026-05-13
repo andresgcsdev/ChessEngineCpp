@@ -11,7 +11,7 @@ A C++ chess engine featuring a fully functional game implementation with AI oppo
 - **Full Chess Rules:** Pawn promotion, castling, en passant, check/checkmate detection
 - **AI Engine:** Minimax search with alpha-beta pruning and piece-square table evaluation
 - **Game State Management:** Full move history with undo/revert functionality
-- **Clean Architecture:** Separation of concerns (Model, View, Controller, AI)
+- **Clean Architecture:** Separation of concerns into `types`, `board`, `movegen`, `game`, `engine`, `ui`
 
 ---
 
@@ -80,29 +80,42 @@ cmake --build build --target chess_test
 
 ### Core Components
 
-**Board** (`core/Board.hpp`):
-- 8x8 piece matrix representation
-- Raw move execution without validation
+**Board** (`board/Board.hpp`): 
+- 8×8 piece matrix
+- Raw piece placement
 
-**Game** (`core/Game.hpp`):
-- Chess rule enforcement (legality, check, checkmate, stalemate)
-- Move history and undo/revert functionality
-- Game state tracking (castling rights, en passant, turn)
+**Game** (`game/Game.hpp`): 
+- Chess rules enforcement
+- Move history
+- Undo with full SnapShot
+- Fast revert with CheapSnap
 
-**Engine** (`core/Engine.hpp`):
-- Minimax search with alpha-beta pruning to configurable depth (default: 4)
-- Position evaluation using material count + piece-square tables
-- Endgame detection for king positioning adjustment
+**Engine** (`engine/Engine.hpp`): 
+- Depth‑5 minimax search with alpha‑beta pruning
+- Move ordering
+- Evaluation call to Eval::evaluate
 
-**ChessUI** (`view/ChessUI.hpp`):
+**MoveGenerator** (`movegen/MoveGenerator.hpp`): 
+- Stateless pseudo‑legal move generation
+- Square control check logic
+
+**Eval** (`engine/Eval.hpp`): 
+- Material + piece‑square table evaluation
+- Endgame detection.
+
+**ChessUI** (`ui/ChessUI.hpp`): 
 - Board display with coordinates
-- Input parsing and validation
+- Input parsing.
 
 ---
 
 ## Design Decisions
 
-**Depth 4 Minimax with Alpha-Beta Pruning:** Alpha-beta pruning eliminates branches that won't affect the final decision, allowing reasonable search depth without excessive computation. Depth 4 balances move quality with search time (5 to 15~ seconds per move).
+**Depth 5 Minimax with Alpha-Beta Pruning:** Alpha-beta pruning eliminates branches that won't affect the final decision, allowing reasonable search depth without excessive computation. Depth 5 balances move quality with search time (5 to 15~ seconds per move).
+
+**Move Ordering (MVV‑LVA):** All legal moves are collected and sorted before the search. Captures and promotions are tried first, scored by Most Valuable Victim / Least Valuable Attacker. This triggers more cutoffs and drastically reduces the effective branching factor.
+
+**Delta‑State Revert (CheapSnap):** Instead of copying the full 8×8 board at every search node, only the minimal move delta + pre‑move game state is stored. Reverting a move touches at most 4 squares – constant‑time undo. CheapSnap is 12.5× smaller than a full SnapShot, removing memory traffic as a bottleneck.
 
 **Piece-Square Tables:** Standard chess evaluation tables reward piece placement (e.g., pawns advancing, knights in center, kings centralizing in endgame).
 
@@ -118,7 +131,7 @@ This is my fifth chess implementation, and the first one I'm fully satisfied wit
 
 It started in 2022 with a ~3000 line implementation in VisuAlg (a Portuguese pseudocode language) during the first year of technical school — built purely because the coursework got too easy. That version is lost.
 
-From there came a JavaScript web implementation during the second year, featuring a partially functional AI called `PeacockBass` — the name is a joke one related to stockfish, I found the portuguese name funny at the time. It was abandoned due to JavaScript's performance limits and a bug in the capture evaluation that took too long to track down. The code is still on GitHub if you're curious.
+From there came a JavaScript web implementation during the second year, featuring a partially functional AI called PeacockBass — the name is a joke one related to stockfish, I found the portuguese name funny at the time. It was abandoned due to JavaScript's performance limits and a bug in the capture evaluation that took too long to track down. The code is still on GitHub if you're curious.
 
 Then a first C++ version, functional but without proper architecture. Then implementations in Java, Rust, and others — each one using chess as a benchmark for learning a new language. The same problem, different constraints, different lessons each time.
 
@@ -128,16 +141,19 @@ This version is the result of all of that. Same problem, finally complete.
 
 ## Known Limitations
 
-- Search depth limited to 4 (sufficient for reasonable play, but not tournament-level)
 - No opening book or endgame tables
-- Evaluation considers only material and position, not advanced tactics (pins, forks, etc.)
+- Evaluation considers material and position; no tactical pattern detection (pins, forks, etc.)
+- Worst‑case search time still spikes in complex mid‑games (a few seconds on average, but up to ~20s)
 
 ---
 
 ## Future Improvements
 
-- Move Ordering for Alpha-beta pruning
-- GUI implementation
+- Transposition tables (position caching)
+- Iterative deepening
+- Killer moves / history heuristic
+- GUI (Python + tkinter, FEN‑based communication)
+- Evaluation improvements (pawn structure, king safety, mobility)
 
 ---
 
@@ -149,6 +165,7 @@ The engine uses a minimax algorithm with alternating maximization/minimization l
 - Opponent minimizes the engine's advantage (plays optimally against you)
 - Positions are evaluated at max depth; deeper moves are explored recursively
 - Alpha-beta pruning optimizes the search by skipping evaluation of branches where the opponent has already proven they have better alternatives.
+- Move ordering sorts captures and promotions first, making pruning far more effective.
 
 Position evaluation = material value + positional bonuses from piece-square tables. Checkmate returns ±∞; stalemate returns -50 (discouraged but acceptable).
 
@@ -167,3 +184,7 @@ If you want to see more: [github.com/andresgcsdev](https://github.com/andresgcsd
 ---
 
 *Built as a portfolio project to demonstrate C++ fundamentals, algorithm design, and software architecture.*
+
+---
+
+***Pragmatism over purism.***
