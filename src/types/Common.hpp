@@ -83,6 +83,22 @@ struct CheapSnap
     Coord whiteKing;
 };
 
+// Transposition Table Entry.
+struct TTEntry
+{
+    enum Flag : uint8_t {
+        EMPTY = 0,
+        EXACT = 1,
+        ALPHA = 2,   // upper bound (fail-low)
+        BETA  = 3    // lower bound (fail-high)
+    };
+
+    uint64_t hash = 0;
+    int score = 0;
+    int depth = 0;
+    uint8_t flag = 0;
+};
+
 // Checks if Coordinate is not out of bounds.
 inline bool isValidCoord(Coord c)
 {

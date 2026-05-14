@@ -5,6 +5,9 @@
 #include "../board/Board.hpp"
 #include "../types/Common.hpp"
 #include "../engine/Engine.hpp"
+
+#include <optional>
+
 #include "Eval.hpp"
 #include "movegen/MoveGenerator.hpp"
 
@@ -99,9 +102,31 @@ std::vector<std::pair<MoveInfo, int> > Engine::sortMoveInfo(const std::vector<Mo
 {
     std::vector<std::pair<MoveInfo, int> > scored;
     for (auto &m: moves)
-        scored.push_back(std::pair<MoveInfo, int>{m, scored.size()});
+        scored.emplace_back(m, Eval::moveScore(m, board));
 
     std::sort(scored.begin(), scored.end(), compareMoves);
 
     return scored;
+}
+
+std::array<TTEntry, Engine::TT_SIZE> Engine::TranspositionTable = {};
+
+void Engine::storeTT(const TTEntry &entry)
+{
+    const size_t index = entry.hash & (TT_SIZE - 1);
+    TTEntry& existing = TranspositionTable[index];
+    if (existing.hash == entry.hash && existing.depth > entry.depth) {
+        return;   // don't overwrite a deeper entry for the same position
+    }
+    existing = entry;   // replace otherwise
+}
+
+std::optional<TTEntry> Engine::probeTT(const uint64_t hash, const int depth)
+{
+    const size_t index = hash & (TT_SIZE - 1);
+    const TTEntry& entry = TranspositionTable[index];
+    if (entry.hash == hash && entry.depth >= depth) {
+        return entry;
+    }
+    return std::nullopt;  // no usable entry
 }

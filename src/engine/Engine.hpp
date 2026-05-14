@@ -1,5 +1,6 @@
 #pragma once
 #include <array>
+#include <optional>
 #include <vector>
 
 #include "../game/Game.hpp"
@@ -13,7 +14,6 @@
 class Engine
 {
 public:
-
     // Evaluates what is the next best move for the engine.
     // Returns an array of coords, index 0 is `from` and index 1 is `to`.
     // May return an Out-of-bounds coord array if the turn doesn't match the Engine color.
@@ -21,6 +21,17 @@ public:
 
 private:
     static constexpr int SEARCH_DEPTH = 4;
+
+    static constexpr size_t TT_SIZE = 1 << 19; // 524288 or 2^19 entries
+
+    // Hash Table
+    static std::array<TTEntry, TT_SIZE> TranspositionTable;
+
+    // Store TTEntry into the hash table
+    static void storeTT(const TTEntry &entry);
+
+    // Get TTEntry based on hash.
+    static std::optional<TTEntry> probeTT(uint64_t hash, int depth);
 
     // Minimax function for interation through moves.
     // Includes Alpha-Beta pruning.
@@ -31,10 +42,10 @@ private:
 
     // Sorts a MoveInfo vector by MVV-LVA.
     // Returns a sorted vector of the pair moves + their score.
-    static std::vector<std::pair<MoveInfo, int>> sortMoveInfo(const std::vector<MoveInfo> &moves, const Board &board);
+    static std::vector<std::pair<MoveInfo, int> > sortMoveInfo(const std::vector<MoveInfo> &moves, const Board &board);
 
-    static bool compareMoves(const std::pair<MoveInfo, int>& a, const std::pair<MoveInfo, int>& b) {
+    static bool compareMoves(const std::pair<MoveInfo, int> &a, const std::pair<MoveInfo, int> &b)
+    {
         return a.second > b.second;
     }
-
 };

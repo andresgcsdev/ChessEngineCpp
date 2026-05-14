@@ -20,5 +20,5 @@ namespace Eval
     int moveScore(
         const MoveInfo &move,
         const Board &board
-        );
+    );
 }

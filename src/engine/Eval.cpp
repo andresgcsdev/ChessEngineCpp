@@ -252,12 +252,14 @@ int Eval::evaluate(Game &game, const Color &selfColor)
     return score;
 }
 
-int moveScore(const MoveInfo& move, const Board& board) {
+int Eval::moveScore(const MoveInfo &move, const Board &board)
+{
     if (move.type == MoveType::PROMOTION)
         return 200'000 + QUEEN_VALUE;
 
-    if (move.type == MoveType::CAPTURE || move.type == MoveType::ENPASSANT) {
-        int victim  = pieceValue(move.captured.t);
+    if (move.type == MoveType::CAPTURE || move.type == MoveType::ENPASSANT)
+    {
+        int victim = pieceValue(move.captured.t);
         int attacker = pieceValue(board.getPiece(move.from).t);
         return 100'000 + victim * 100 - attacker;
     }
