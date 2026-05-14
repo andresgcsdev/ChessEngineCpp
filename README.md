@@ -2,7 +2,7 @@
 [![Tests](https://github.com/andresgcsdev/ChessEngineCpp/actions/workflows/test.yml/badge.svg)](https://github.com/ExcalDex/ChessEngineCpp/actions)
 
 
-A C++ chess engine featuring a fully functional game implementation with AI opponent powered by minimax search with position evaluation.
+A C++ chess engine with a full game implementation and an AI opponent powered by minimax search, alpha‑beta pruning, move ordering, Zobrist hashing, and a transposition table.
 
 ---
 
@@ -10,9 +10,10 @@ A C++ chess engine featuring a fully functional game implementation with AI oppo
 
 - **Full Chess Rules:** Pawn promotion, castling, en passant, check/checkmate detection
 - **AI Engine:** Minimax search with alpha-beta pruning and piece-square table evaluation
+- **Position Hashing:** Zobrist hashing with incremental updates (64‑bit keys)
 - **Game State Management:** Full move history with undo/revert functionality
-- **Clean Architecture:** Separation of concerns into `types`, `board`, `movegen`, `game`, `engine`, `ui`
-
+- **Clean Architecture:** Separation of concerns into `board`, `engine`, `fingerprint`, `game`, `movegen`, `types` and `ui`
+- **Testing:** 180 unit tests, all passing (FEN‑based validation)
 ---
 
 ## Building
@@ -47,7 +48,7 @@ Run the executable and follow the on-screen prompts:
 - Select the piece you want to move
 - Enter coordinates in algebraic notation (e.g., `e2` or `h8`)
 - White plays first
-- The AI (black) will respond with its best move
+- The AI will respond with its best move
 
 ---
 
@@ -91,7 +92,7 @@ cmake --build build --target chess_test
 - Fast revert with CheapSnap
 
 **Engine** (`engine/Engine.hpp`): 
-- Depth‑5 minimax search with alpha‑beta pruning
+- Depth‑6 minimax search with alpha‑beta pruning
 - Move ordering
 - Evaluation call to Eval::evaluate
 
@@ -101,7 +102,15 @@ cmake --build build --target chess_test
 
 **Eval** (`engine/Eval.hpp`): 
 - Material + piece‑square table evaluation
-- Endgame detection.
+- Endgame detection
+
+**Zobrist** (`fingerprint/Zobrist.hpp`): 
+- 64‑bit position hashing with incremental XOR updates
+- Random tables fixed for reproducibility.
+
+**Transposition Table** (`currently inside Engine`):
+- 12MB static array storing hash, score, depth, and bound flag (EXACT/ALPHA/BETA)
+- Used to cache searched positions and avoid re‑searching transpositions
 
 **ChessUI** (`ui/ChessUI.hpp`): 
 - Board display with coordinates
@@ -111,17 +120,19 @@ cmake --build build --target chess_test
 
 ## Design Decisions
 
-**Depth 5 Minimax with Alpha-Beta Pruning:** Alpha-beta pruning eliminates branches that won't affect the final decision, allowing reasonable search depth without excessive computation. Depth 5 balances move quality with search time (5 to 15~ seconds per move).
+**Depth 6 Minimax with Alpha-Beta Pruning + Table Transposition Cache:** Table Transposition allows Engine to cache already-calculated moves, and  Alpha-beta pruning eliminates branches that won't affect the final decision, allowing reasonable search depth without excessive computation. Depth 6 balances move quality with search time (10 to 15~ seconds per move at first, after TT population goes to 5~ seconds).
 
 **Move Ordering (MVV‑LVA):** All legal moves are collected and sorted before the search. Captures and promotions are tried first, scored by Most Valuable Victim / Least Valuable Attacker. This triggers more cutoffs and drastically reduces the effective branching factor.
 
 **Delta‑State Revert (CheapSnap):** Instead of copying the full 8×8 board at every search node, only the minimal move delta + pre‑move game state is stored. Reverting a move touches at most 4 squares – constant‑time undo. CheapSnap is 12.5× smaller than a full SnapShot, removing memory traffic as a bottleneck.
 
+**Transposition Table (TT):** Positions are hashed with Zobrist (64‑bit). The table stores depth, score, and bound type. At the start of a search node we probe the TT – if the stored depth is sufficient and the bound allows an early cutoff, we return immediately. This prevents re‑searching identical positions reached through different move orders. The TT is a static 12 MB array (data segment, not stack) to avoid overflow.
+
+**Zobrist Hashing – Incremental Updates:** The game state hash is updated during move execution by XOR‑ing out the old piece key at `from`, XOR‑ing in the new piece key at `to`, and toggling side‑to‑move, en passant file, and castling rights as needed. No recomputation from scratch. The hash in CheapSnap is restored automatically on revert.
+
 **Piece-Square Tables:** Standard chess evaluation tables reward piece placement (e.g., pawns advancing, knights in center, kings centralizing in endgame).
 
-**No Inheritance:** Kept the design simple with composition over inheritance, avoiding over-abstraction.
-
-**Stack-only allocation:** The project deliberately avoids heap allocations wherever possible. All core game state — the board, piece data, game state structs — lives on the stack. This keeps memory management predictable, avoids fragmentation, and removes the overhead of dynamic allocation in the hot path of the search algorithm. The choice reflects a conscious effort to write C++ that actually takes advantage of the language rather than treating it like a garbage-collected language with manual cleanup.
+**No Inheritance / Stack‑first Allocation:** The design uses composition over inheritance and avoids virtual classes. Core game state (board, piece data, state structs) lives on the stack where possible. Large structures (TT, move lists) are placed on the heap or in static data. This keeps memory predictable and removes allocation overhead from the search hot path.
 
 ---
 
@@ -166,6 +177,7 @@ The engine uses a minimax algorithm with alternating maximization/minimization l
 - Positions are evaluated at max depth; deeper moves are explored recursively
 - Alpha-beta pruning optimizes the search by skipping evaluation of branches where the opponent has already proven they have better alternatives.
 - Move ordering sorts captures and promotions first, making pruning far more effective.
+- Transposition table caches evaluated positions, often reusing a deeper search result from another branch.
 
 Position evaluation = material value + positional bonuses from piece-square tables. Checkmate returns ±∞; stalemate returns -50 (discouraged but acceptable).
 
