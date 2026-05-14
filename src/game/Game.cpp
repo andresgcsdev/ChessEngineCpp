@@ -4,6 +4,7 @@
 #include "../board/Board.hpp"
 #include "../types/Common.hpp"
 #include "../movegen/MoveGenerator.hpp"
+#include "fingerprint/Zobrist.hpp"
 
 Game::Game()
 {
@@ -49,6 +50,9 @@ Game::Game()
     // Rows 5-2 (Empty - defaults are already BLANK)
 
     board.setMatrix(matrix);
+
+    Zobrist::init();
+    gameState.hash = Zobrist::computeHash(board, gameState);
 }
 
 Board Game::getBoard() const
@@ -79,6 +83,7 @@ bool Game::move(Coord from, Coord to)
     if (movingPiece.t == PieceType::BLANK || movingPiece.t == PieceType::ERROR || !isValidCoord(to))
         return false;
 
+    // Last move state update
     lastCheapSnap.state = gameState;
     lastCheapSnap.blackKing = blackKing;
     lastCheapSnap.whiteKing = whiteKing;
@@ -180,6 +185,61 @@ bool Game::move(Coord from, Coord to)
     }
 
     changeTurn();
+
+    // Update hash with XOR addition/subtraction.
+    const Piece moved = board.getPiece(lastCheapSnap.lastMove.to);
+    if (lastCheapSnap.lastMove.type == MoveType::QUIET)
+    {
+        gameState.hash ^= Zobrist::getPieceKey(moved, lastCheapSnap.lastMove.from);
+        gameState.hash ^= Zobrist::getPieceKey(moved, lastCheapSnap.lastMove.to);
+    }
+    if (lastCheapSnap.lastMove.type == MoveType::CAPTURE)
+    {
+        gameState.hash ^= Zobrist::getPieceKey(moved, lastCheapSnap.lastMove.from);
+        gameState.hash ^= Zobrist::getPieceKey(lastCheapSnap.lastMove.captured, lastCheapSnap.lastMove.to);
+        gameState.hash ^= Zobrist::getPieceKey(moved, lastCheapSnap.lastMove.to);
+    }
+    if (lastCheapSnap.lastMove.type == MoveType::PROMOTION)
+    {
+        const Piece originalPawn = {PieceType::PAWN, moved.c, moved.id};
+        gameState.hash ^= Zobrist::getPieceKey(originalPawn, lastCheapSnap.lastMove.from);
+        gameState.hash ^= Zobrist::getPieceKey(moved, lastCheapSnap.lastMove.to);
+    }
+    if (lastCheapSnap.lastMove.type == MoveType::ENPASSANT)
+    {
+        gameState.hash ^= Zobrist::getPieceKey(moved, lastCheapSnap.lastMove.from);
+        gameState.hash ^= Zobrist::getPieceKey(moved, lastCheapSnap.lastMove.to);
+        gameState.hash ^= Zobrist::getPieceKey(lastCheapSnap.lastMove.captured, Coord{lastCheapSnap.lastMove.from.row, lastCheapSnap.lastMove.to.col});
+    }
+    if (lastCheapSnap.lastMove.type == MoveType::CASTLING_KS)
+    {
+        gameState.hash ^= Zobrist::getPieceKey(moved, lastCheapSnap.lastMove.from);
+        gameState.hash ^= Zobrist::getPieceKey(moved, lastCheapSnap.lastMove.to);
+        const Coord rookCoord = {lastCheapSnap.lastMove.to.row, lastCheapSnap.lastMove.to.col - 1};
+        const Piece rook = board.getPiece(rookCoord);
+        gameState.hash ^= Zobrist::getPieceKey(rook, rookCoord);
+        const Coord originalRookCoord = {rookCoord.row, rookCoord.col + 2};
+        gameState.hash ^= Zobrist::getPieceKey(rook, originalRookCoord);
+    }
+    if (lastCheapSnap.lastMove.type == MoveType::CASTLING_QS)
+    {
+        gameState.hash ^= Zobrist::getPieceKey(moved, lastCheapSnap.lastMove.from);
+        gameState.hash ^= Zobrist::getPieceKey(moved, lastCheapSnap.lastMove.to);
+        const Coord rookCoord = {lastCheapSnap.lastMove.to.row, lastCheapSnap.lastMove.to.col + 1};
+        const Piece rook = board.getPiece(rookCoord);
+        gameState.hash ^= Zobrist::getPieceKey(rook, rookCoord);
+        const Coord originalRookCoord = {rookCoord.row, rookCoord.col - 3};
+        gameState.hash ^= Zobrist::getPieceKey(rook, originalRookCoord);
+    }
+
+    // Toggle turn.
+    gameState.hash ^= Zobrist::sideKey;
+    // Add new, remove old en passant.
+    gameState.hash ^= Zobrist::getEnPassantKey(gameState.enPassant);
+    gameState.hash ^= Zobrist::getEnPassantKey(lastCheapSnap.state.enPassant);
+    // Add new, remove old castling rights.
+    gameState.hash ^= Zobrist::getCastlingKey(gameState);
+    gameState.hash ^= Zobrist::getCastlingKey(lastCheapSnap.state);
     return true;
 }
 
@@ -373,7 +433,11 @@ bool Game::staleMateByMaterial() const
                     return false;
         }
     }
-
     return true;
+}
+
+void Game::updateHash()
+{
+    gameState.hash = Zobrist::computeHash(board, gameState);
 }
 

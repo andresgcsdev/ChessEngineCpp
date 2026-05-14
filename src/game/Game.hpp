@@ -67,7 +67,11 @@ public:
     // Returns true when there are only kings on the board.
     bool staleMateByMaterial() const;
 
+    // Returns Game State copy.
     GameState getCurrentState() const;
+
+    // Reruns hash calculation for current board.
+    void updateHash();
 
 private:
     std::stack<SnapShot> history;

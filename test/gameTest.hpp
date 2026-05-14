@@ -1174,7 +1174,7 @@ void testStalemate(int &ERROR_COUNT, Game &g)
     }
 }
 
-int testMoveClassifier(int ERROR_COUNT, Game &g)
+void testMoveClassifier(int &ERROR_COUNT, Game &g)
 {
     std::cout << "    Move classifier:" << std::endl;
     SnapShot testSnap;
@@ -1211,7 +1211,40 @@ int testMoveClassifier(int ERROR_COUNT, Game &g)
             }
         }
     }
-    return ERROR_COUNT;
+}
+
+void testBoardHash(int &ERROR_COUNT, Game &g)
+{
+    SnapShot testSnap;
+    testSnap.board = FEN_to_matrix("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+    testSnap.state = defaultGameState;
+    testSnap.blackKing = Coord{8, 8};
+    testSnap.whiteKing = Coord{8, 8};
+    g.revertState(testSnap);
+    g.updateHash();
+    uint64_t lastHash = g.getCurrentState().hash;
+    g.applyMove(Coord{6, 4}, Coord{4, 4});
+    uint64_t newHash = g.getCurrentState().hash;
+    g.revertState(g.getCheapSnap());
+    if (g.getCurrentState().hash == lastHash)
+    {
+        std::cout << "        SUCCESS on case 1." << std::endl;
+    }
+    else
+    {
+        std::cout << "        ERROR on case 1." << std::endl;
+        ERROR_COUNT++;
+    }
+    g.applyMove(Coord{6, 4}, Coord{4, 4});
+    if (g.getCurrentState().hash == newHash)
+    {
+        std::cout << "        SUCCESS on case 2." << std::endl;
+    }
+    else
+    {
+        std::cout << "        ERROR on case 2." << std::endl;
+        ERROR_COUNT++;
+    }
 }
 
 // Main Game class test routine function.
@@ -1234,6 +1267,7 @@ int runGameTests()
     testHasMoves(ERROR_COUNT, g);
     testStalemate(ERROR_COUNT, g);
     testMoveClassifier(ERROR_COUNT, g);
+    testBoardHash(ERROR_COUNT, g);
 
     return ERROR_COUNT;
 }

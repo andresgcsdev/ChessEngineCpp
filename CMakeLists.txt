@@ -13,7 +13,7 @@ add_executable(chess
         src/engine/Engine.cpp
         src/movegen/MoveGenerator.cpp
         src/engine/Eval.cpp
-        src/engine/Eval.hpp
+        src/fingerprint/Zobrist.cpp
 )
 target_include_directories(chess PRIVATE src)
 
@@ -32,5 +32,6 @@ add_executable(chess_test
         test/testHelper.hpp
         test/gameTest.hpp
         test/engineTest.hpp
+        src/fingerprint/Zobrist.cpp
 )
 target_include_directories(chess_test PRIVATE src)

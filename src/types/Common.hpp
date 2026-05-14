@@ -1,22 +1,23 @@
 #pragma once
 #include <array>
+#include <cstdint>
 
 enum class Color
 {
-    BLACK,
-    WHITE
+    BLACK = 0,
+    WHITE = 1
 };
 
 enum class PieceType
 {
-    PAWN,
-    KING,
-    QUEEN,
-    KNIGHT,
-    BISHOP,
-    ROOK,
-    BLANK,
-    ERROR
+    PAWN = 0,
+    KING = 1,
+    QUEEN = 2,
+    KNIGHT = 3,
+    BISHOP = 4,
+    ROOK = 5,
+    BLANK = 6,
+    ERROR = -1
 };
 
 struct Piece
@@ -40,6 +41,7 @@ struct GameState
     // id 1: Queen Side, id 2: King Side
     bool castling[2][2] = {{true, true}, {true, true}};
     Coord enPassant;
+    uint64_t hash = 0;
 };
 
 // Game data struct.
@@ -54,12 +56,12 @@ struct SnapShot
 
 enum class MoveType
 {
-    QUIET,
-    CAPTURE,
-    ENPASSANT,
-    CASTLING_KS,
-    CASTLING_QS,
-    PROMOTION
+    QUIET = 0,
+    CAPTURE = 1,
+    ENPASSANT = 3,
+    CASTLING_KS = 4,
+    CASTLING_QS = 5,
+    PROMOTION = 6
 };
 
 struct MoveInfo
