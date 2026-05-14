@@ -160,7 +160,6 @@ This version is the result of all of that. Same problem, finally complete.
 
 ## Future Improvements
 
-- Transposition tables (position caching)
 - Iterative deepening
 - Killer moves / history heuristic
 - GUI (Python + tkinter, FEN‑based communication)
