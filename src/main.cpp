@@ -31,8 +31,6 @@ int main()
             // Change this color value to WHITE to play as black.
             if (g.getTurn() != playerColor)
             {
-                // Depth higher than 4 is too slow as of now. Will implement better search in the future.
-                // Depth lower than 4 is instant, but plays pretty badly.
                 std::array<Coord, 2> bestMove = engine.getBestMove(g, playerColor == Color::WHITE ? Color::BLACK : Color::WHITE);
                 g.makeMove(bestMove[0], bestMove[1]);
             }
