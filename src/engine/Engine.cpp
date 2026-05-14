@@ -40,35 +40,66 @@ std::array<Coord, 2> Engine::getBestMove(Game game, const Color &selfColor)
             {fromMax, toMax};
 }
 
-int Engine::minimax(Game &game, int depth, int alpha, int beta, const Color &selfColor)
-{
-    if (depth == 0)
-        return Eval::evaluate(game, selfColor);
+int Engine::minimax(Game &game, int depth, int alpha, int beta, const Color &selfColor) {
+    if (depth == 0) return Eval::evaluate(game, selfColor);
 
-    bool isMaximizing = game.getTurn() == selfColor;
+    const uint64_t nodeHash = game.getCurrentState().hash;
+    const int alphaOrig = alpha;
+
+    // TT lookup for the current node
+    if (const auto entry = probeTT(nodeHash, depth)) {
+        if (entry->flag == TTEntry::EXACT) return entry->score;
+        if (entry->flag == TTEntry::ALPHA && entry->score <= alpha) return alpha;
+        if (entry->flag == TTEntry::BETA && entry->score >= beta) return beta;
+    }
+
+    const bool isMaximizing = (game.getTurn() == selfColor);
     int bestScore = isMaximizing ? INT_MIN : INT_MAX;
-    std::vector<std::pair<MoveInfo, int> > scoredMoves = sortMoveInfo(getAllMoveInfo(game, game.getTurn()), game.getBoard());
-    for (auto &[m, _]: scoredMoves)
-    {
+    auto moves = sortMoveInfo(getAllMoveInfo(game, game.getTurn()), game.getBoard());
+
+    for (auto &[m, _] : moves) {
         game.applyMove(m.from, m.to);
         CheapSnap snap = game.getCheapSnap();
-        int score = minimax(game, depth - 1, alpha, beta, selfColor);
+        const uint64_t childHash = game.getCurrentState().hash;
+
+        int score;
+        bool usedTT = false;
+
+        if (const auto entry = probeTT(childHash, depth - 1)) {
+            if (entry->flag == TTEntry::EXACT || entry->flag == TTEntry::ALPHA && entry->score <= alpha) {
+                score = entry->score;
+                usedTT = true;
+            } else if (entry->flag == TTEntry::BETA && entry->score >= beta) {
+                score = beta;
+                usedTT = true;
+                game.revertState(snap);
+                bestScore = beta;
+                break;   // cutoff
+            }
+        }
+
+        if (!usedTT)
+            score = minimax(game, depth - 1, alpha, beta, selfColor);
+
         game.revertState(snap);
-        if (isMaximizing)
-        {
+
+        if (isMaximizing) {
             bestScore = std::max(bestScore, score);
             alpha = std::max(alpha, bestScore);
-            if (beta <= alpha)
-                break;
-        }
-        else
-        {
+        } else {
             bestScore = std::min(bestScore, score);
             beta = std::min(beta, bestScore);
-            if (beta <= alpha)
-                break;
         }
+        if (beta <= alpha) break;
     }
+
+    // Store the result for this node
+    TTEntry::Flag flag;
+    if (bestScore <= alphaOrig) flag = TTEntry::ALPHA;
+    else if (bestScore >= beta) flag = TTEntry::BETA;
+    else                        flag = TTEntry::EXACT;
+    storeTT({nodeHash, bestScore, depth, flag});
+
     return bestScore;
 }
 
@@ -114,19 +145,21 @@ std::array<TTEntry, Engine::TT_SIZE> Engine::TranspositionTable = {};
 void Engine::storeTT(const TTEntry &entry)
 {
     const size_t index = entry.hash & (TT_SIZE - 1);
-    TTEntry& existing = TranspositionTable[index];
-    if (existing.hash == entry.hash && existing.depth > entry.depth) {
-        return;   // don't overwrite a deeper entry for the same position
+    TTEntry &existing = TranspositionTable[index];
+    if (existing.hash == entry.hash && existing.depth > entry.depth)
+    {
+        return; // don't overwrite a deeper entry for the same position
     }
-    existing = entry;   // replace otherwise
+    existing = entry; // replace otherwise
 }
 
 std::optional<TTEntry> Engine::probeTT(const uint64_t hash, const int depth)
 {
     const size_t index = hash & (TT_SIZE - 1);
-    const TTEntry& entry = TranspositionTable[index];
-    if (entry.hash == hash && entry.depth >= depth) {
+    const TTEntry &entry = TranspositionTable[index];
+    if (entry.hash == hash && entry.depth >= depth)
+    {
         return entry;
     }
-    return std::nullopt;  // no usable entry
+    return std::nullopt; // no usable entry
 }

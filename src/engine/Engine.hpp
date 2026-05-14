@@ -20,7 +20,7 @@ public:
     std::array<Coord, 2> getBestMove(Game game, const Color &selfColor);
 
 private:
-    static constexpr int SEARCH_DEPTH = 4;
+    static constexpr int SEARCH_DEPTH = 5;
 
     static constexpr size_t TT_SIZE = 1 << 19; // 524288 or 2^19 entries
 
