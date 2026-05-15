@@ -16,6 +16,7 @@ add_executable(chess
         src/fingerprint/Zobrist.cpp
 )
 target_include_directories(chess PRIVATE src)
+target_link_options(chess PRIVATE -static)
 
 # Test executable
 add_executable(chess_test
