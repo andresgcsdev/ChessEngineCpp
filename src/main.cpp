@@ -63,7 +63,7 @@ int main()
                     }
                 } while (!isValidCoord(posb[0]));
 
-                ui.println("Where do you want to move it to?");
+                ui.println("Where do you want to move it to? (type 'undo' to go to previous step)");
                 ui.printMoves(posb);
                 Coord to;
                 bool isPossible = false;
@@ -71,6 +71,8 @@ int main()
                 do
                 {
                     input = ui.getInput();
+                    if (input == "undo")
+                        break;
                     to = ui.translateCoordinates(input);
                     if (!isValidCoord(to))
                         continue;
