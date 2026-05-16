@@ -44,6 +44,7 @@ Run the executable and follow the on-screen prompts:
 ```bash
 ./chess  # or ./chess.exe on Windows
 ```
+- Select the Depth parameter of the Engine (Basically the difficulty)
 - Select which color you want to play as
 - Select the piece you want to move
 - Enter coordinates in algebraic notation (e.g., `e2` or `h8`)
