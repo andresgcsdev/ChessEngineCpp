@@ -47,8 +47,6 @@ std::array<Coord, 2> Engine::getBestMove(Game game, const Color &selfColor, int 
 
 int Engine::minimax(Game &game, int depth, int alpha, int beta, const Color &selfColor)
 {
-    if (depth == 0) return Eval::evaluate(game, selfColor);
-
     if (!game.hasMoves(game.getTurn()))
     {
         if (game.isKingInCheck(game.getTurn()))
@@ -62,6 +60,8 @@ int Engine::minimax(Game &game, int depth, int alpha, int beta, const Color &sel
         // Always discourage Stalemate, but will go for it if it's the only option
         return -50;
     }
+
+    if (depth == 0) return Eval::evaluate(game, selfColor);
 
     const uint64_t nodeHash = game.getCurrentState().hash;
     const int alphaOrig = alpha;

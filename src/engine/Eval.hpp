@@ -4,7 +4,7 @@
 
 namespace Eval
 {
-    constexpr int MATE_VAL = 100'000;
+    constexpr int MATE_VAL = 100'000'000;
 
     // Current implementation defines endgame when global material is low (both self and the opponent's).
     bool isEndgame(const Game &game);
