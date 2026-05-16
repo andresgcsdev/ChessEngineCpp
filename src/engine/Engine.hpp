@@ -17,11 +17,11 @@ public:
     // Evaluates what is the next best move for the engine.
     // Returns an array of coords, index 0 is `from` and index 1 is `to`.
     // May return an Out-of-bounds coord array if the turn doesn't match the Engine color.
-    std::array<Coord, 2> getBestMove(Game game, const Color &selfColor, int depth);
+    static std::array<Coord, 2> getBestMove(Game game, const Color &selfColor, int depth);
 
 private:
 
-    static constexpr size_t TT_SIZE = 1 << 19; // 524288 or 2^19 entries
+    static constexpr size_t TT_SIZE = 1 << 20; // 1.048.576 or 2^20 entries
 
     // Hash Table
     static std::array<TTEntry, TT_SIZE> TranspositionTable;
