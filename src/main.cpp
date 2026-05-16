@@ -110,4 +110,6 @@ int main()
             }
         }
     }
+    ui.println("Press any key to end...");
+    ui.getInput();
 }
