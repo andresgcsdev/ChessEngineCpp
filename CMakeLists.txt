@@ -6,7 +6,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Main game executable
 add_executable(chess
-        src/main.cpp
         src/board/Board.cpp
         src/game/Game.cpp
         src/ui/ChessUI.cpp
