@@ -218,3 +218,11 @@ void ChessUI::printMoves(const std::array<Coord, 27> &posb) const
         }
     }
 }
+
+void ChessUI::printMovePiece(const Board &b, Coord from, Coord to) const
+{
+    const std::string piecePrint = convertPieceToText(b.getPiece(from));
+    const std::string fromStr = convertCoordToText(from);
+    const std::string toStr = convertCoordToText(to);
+    std::cout << piecePrint << " at " << fromStr << " to " << toStr << std::endl;
+}

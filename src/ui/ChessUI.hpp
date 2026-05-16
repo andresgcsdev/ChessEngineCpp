@@ -37,4 +37,7 @@ public:
     // Converts a piece into text form.
     // Returns "ERR" if the given piece is invalid.
     std::string convertPieceToText(Piece p) const;
+
+    // Prints the move that will be done with the piece moved.
+    void printMovePiece(const Board &b, Coord from, Coord to) const;
 };

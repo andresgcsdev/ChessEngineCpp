@@ -38,6 +38,7 @@ int main()
             if (g.getTurn() != playerColor)
             {
                 std::array<Coord, 2> bestMove = engine.getBestMove(g, playerColor == Color::WHITE ? Color::BLACK : Color::WHITE, depth);
+                ui.printMovePiece(g.getBoard(), bestMove[0], bestMove[1]);
                 g.makeMove(bestMove[0], bestMove[1]);
             }
             else
