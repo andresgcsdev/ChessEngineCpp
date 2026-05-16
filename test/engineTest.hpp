@@ -20,7 +20,7 @@ int runEngineTests()
     testSnap.blackKing = defaultBlackKing;
     testSnap.whiteKing =defaultWhiteKing;
     g.revertState(testSnap);
-    std::array<Coord, 2> testEngine = wai.getBestMove(g, Color::WHITE);
+    std::array<Coord, 2> testEngine = wai.getBestMove(g, Color::WHITE, 4);
     if (g.makeMove(testEngine[0], testEngine[1]))
     {
         std::cout << "        SUCCESS on case 1." << std::endl;
@@ -30,7 +30,7 @@ int runEngineTests()
         std::cout << "        ERROR on case 1." << std::endl;
         ERROR_COUNT++;
     }
-    testEngine = bai.getBestMove(g, Color::BLACK);
+    testEngine = bai.getBestMove(g, Color::BLACK, 4);
     if (g.makeMove(testEngine[0], testEngine[1]))
     {
         std::cout << "        SUCCESS on case 2." << std::endl;

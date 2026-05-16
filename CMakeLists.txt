@@ -6,7 +6,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Main game executable
 add_executable(chess
-        src/main.cpp
         src/board/Board.cpp
         src/game/Game.cpp
         src/ui/ChessUI.cpp
@@ -14,6 +13,7 @@ add_executable(chess
         src/movegen/MoveGenerator.cpp
         src/engine/Eval.cpp
         src/fingerprint/Zobrist.cpp
+        src/main.cpp
 )
 target_include_directories(chess PRIVATE src)
 target_link_options(chess PRIVATE -static)

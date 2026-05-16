@@ -14,6 +14,12 @@ int main()
     Game g;
     ChessUI ui;
 
+    ui.println("What depth will the Engine go to? (from 0 to 5)");
+    std::string strdepth = ui.getInput();
+    while (strdepth[0] < '0' || strdepth[0] > '5')
+        strdepth = ui.getInput();
+    const int depth = strdepth[0] - '0';
+
     ui.println("Welcome! Which color will you play as? (w for White and b for Black)");
     std::string color = ui.getInput();
     while (color[0] != 'w' && color[0] != 'b')
@@ -31,7 +37,7 @@ int main()
             // Change this color value to WHITE to play as black.
             if (g.getTurn() != playerColor)
             {
-                std::array<Coord, 2> bestMove = engine.getBestMove(g, playerColor == Color::WHITE ? Color::BLACK : Color::WHITE);
+                std::array<Coord, 2> bestMove = engine.getBestMove(g, playerColor == Color::WHITE ? Color::BLACK : Color::WHITE, depth);
                 g.makeMove(bestMove[0], bestMove[1]);
             }
             else

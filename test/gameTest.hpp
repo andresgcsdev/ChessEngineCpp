@@ -1215,6 +1215,7 @@ void testMoveClassifier(int &ERROR_COUNT, Game &g)
 
 void testBoardHash(int &ERROR_COUNT, Game &g)
 {
+    std::cout << "    Move hashing:" << std::endl;
     SnapShot testSnap;
     testSnap.board = FEN_to_matrix("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
     testSnap.state = defaultGameState;
@@ -1247,6 +1248,29 @@ void testBoardHash(int &ERROR_COUNT, Game &g)
     }
 }
 
+void testMoveApplier(int &ERROR_COUNT, Game &g)
+{
+    std::cout << "    Move applier:" << std::endl;
+    SnapShot testSnap;
+    testSnap.state = defaultGameState;
+    testSnap.blackKing = Coord{8, 8};
+    testSnap.whiteKing = Coord{8, 8};
+    testSnap.board = FEN_to_matrix("8/3P4/8/8/8/8/8/8");
+    Coord from = {1,3};
+    Coord to = {0,4};
+    g.revertState(testSnap);
+    g.applyMove(from, to);
+    if (FEN_notation_generator(g.getSnap()) == "4Q3/8/8/8/8/8/8/8 b KQkq -")
+    {
+        std::cout << "        SUCCESS on case 1." << std::endl;
+    }
+    else
+    {
+        std::cout << "        ERROR on case 1." << std::endl;
+        ERROR_COUNT++;
+    }
+}
+
 // Main Game class test routine function.
 int runGameTests()
 {
@@ -1268,6 +1292,7 @@ int runGameTests()
     testStalemate(ERROR_COUNT, g);
     testMoveClassifier(ERROR_COUNT, g);
     testBoardHash(ERROR_COUNT, g);
+    testMoveApplier(ERROR_COUNT, g);
 
     return ERROR_COUNT;
 }

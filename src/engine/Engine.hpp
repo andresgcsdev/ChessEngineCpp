@@ -17,10 +17,9 @@ public:
     // Evaluates what is the next best move for the engine.
     // Returns an array of coords, index 0 is `from` and index 1 is `to`.
     // May return an Out-of-bounds coord array if the turn doesn't match the Engine color.
-    std::array<Coord, 2> getBestMove(Game game, const Color &selfColor);
+    std::array<Coord, 2> getBestMove(Game game, const Color &selfColor, int depth);
 
 private:
-    static constexpr int SEARCH_DEPTH = 5;
 
     static constexpr size_t TT_SIZE = 1 << 19; // 524288 or 2^19 entries
 

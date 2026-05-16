@@ -155,16 +155,6 @@ bool Eval::isEndgame(const Game &game)
 
 int Eval::evaluate(Game &game, const Color &selfColor)
 {
-    if (!game.hasMoves(game.getTurn()))
-    {
-        if (game.isKingInCheck(game.getTurn()))
-            // Checkmate
-            // Always avoids getting checkmated, always goes for checkmate on the enemy.
-            return game.getTurn() == selfColor ? INT_MIN : INT_MAX;
-        // Stalemate
-        // Always discourage Stalemate, but will go for it if it's the only option
-        return -50;
-    }
     int score = 0;
     int whiteMultiplr = selfColor == Color::WHITE ? 1 : -1;
     for (int row = 0; row < 8; row++)

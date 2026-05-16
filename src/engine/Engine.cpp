@@ -11,10 +11,15 @@
 #include "Eval.hpp"
 #include "movegen/MoveGenerator.hpp"
 
-std::array<Coord, 2> Engine::getBestMove(Game game, const Color &selfColor)
+std::array<Coord, 2> Engine::getBestMove(Game game, const Color &selfColor, int depth)
 {
     if (game.getTurn() != selfColor)
         return {Coord{8, 8}, Coord{8, 8}};
+
+    if (depth <= 0)
+        depth = 1;
+    if (depth >= 6)
+        depth = 5;
 
     int max = INT_MIN;
     Coord fromMax = Coord{8, 8};
@@ -25,7 +30,7 @@ std::array<Coord, 2> Engine::getBestMove(Game game, const Color &selfColor)
     {
         game.applyMove(m.from, m.to);
         CheapSnap snap = game.getCheapSnap();
-        int minimaxVal = minimax(game, SEARCH_DEPTH, INT_MIN, INT_MAX, selfColor);
+        int minimaxVal = minimax(game, depth, INT_MIN, INT_MAX, selfColor);
         game.revertState(snap);
 
         if (minimaxVal > max)
@@ -40,14 +45,30 @@ std::array<Coord, 2> Engine::getBestMove(Game game, const Color &selfColor)
             {fromMax, toMax};
 }
 
-int Engine::minimax(Game &game, int depth, int alpha, int beta, const Color &selfColor) {
+int Engine::minimax(Game &game, int depth, int alpha, int beta, const Color &selfColor)
+{
     if (depth == 0) return Eval::evaluate(game, selfColor);
+
+    if (!game.hasMoves(game.getTurn()))
+    {
+        if (game.isKingInCheck(game.getTurn()))
+        {
+            // Checkmate
+            // Always avoids getting checkmated, always goes for checkmate on the enemy.
+            const int mateValue = Eval::MATE_VAL - depth;
+            return game.getTurn() == selfColor ? -mateValue : mateValue;
+        }
+        // Stalemate
+        // Always discourage Stalemate, but will go for it if it's the only option
+        return -50;
+    }
 
     const uint64_t nodeHash = game.getCurrentState().hash;
     const int alphaOrig = alpha;
 
     // TT lookup for the current node
-    if (const auto entry = probeTT(nodeHash, depth)) {
+    if (const auto entry = probeTT(nodeHash, depth))
+    {
         if (entry->flag == TTEntry::EXACT) return entry->score;
         if (entry->flag == TTEntry::ALPHA && entry->score <= alpha) return alpha;
         if (entry->flag == TTEntry::BETA && entry->score >= beta) return beta;
@@ -57,7 +78,8 @@ int Engine::minimax(Game &game, int depth, int alpha, int beta, const Color &sel
     int bestScore = isMaximizing ? INT_MIN : INT_MAX;
     auto moves = sortMoveInfo(getAllMoveInfo(game, game.getTurn()), game.getBoard());
 
-    for (auto &[m, _] : moves) {
+    for (auto &[m, _]: moves)
+    {
         game.applyMove(m.from, m.to);
         CheapSnap snap = game.getCheapSnap();
         const uint64_t childHash = game.getCurrentState().hash;
@@ -65,16 +87,20 @@ int Engine::minimax(Game &game, int depth, int alpha, int beta, const Color &sel
         int score;
         bool usedTT = false;
 
-        if (const auto entry = probeTT(childHash, depth - 1)) {
-            if (entry->flag == TTEntry::EXACT || entry->flag == TTEntry::ALPHA && entry->score <= alpha) {
+        if (const auto entry = probeTT(childHash, depth - 1))
+        {
+            if (entry->flag == TTEntry::EXACT || entry->flag == TTEntry::ALPHA && entry->score <= alpha)
+            {
                 score = entry->score;
                 usedTT = true;
-            } else if (entry->flag == TTEntry::BETA && entry->score >= beta) {
+            }
+            else if (entry->flag == TTEntry::BETA && entry->score >= beta)
+            {
                 score = beta;
                 usedTT = true;
                 game.revertState(snap);
                 bestScore = beta;
-                break;   // cutoff
+                break; // cutoff
             }
         }
 
@@ -83,10 +109,13 @@ int Engine::minimax(Game &game, int depth, int alpha, int beta, const Color &sel
 
         game.revertState(snap);
 
-        if (isMaximizing) {
+        if (isMaximizing)
+        {
             bestScore = std::max(bestScore, score);
             alpha = std::max(alpha, bestScore);
-        } else {
+        }
+        else
+        {
             bestScore = std::min(bestScore, score);
             beta = std::min(beta, bestScore);
         }
@@ -97,7 +126,7 @@ int Engine::minimax(Game &game, int depth, int alpha, int beta, const Color &sel
     TTEntry::Flag flag;
     if (bestScore <= alphaOrig) flag = TTEntry::ALPHA;
     else if (bestScore >= beta) flag = TTEntry::BETA;
-    else                        flag = TTEntry::EXACT;
+    else flag = TTEntry::EXACT;
     storeTT({nodeHash, bestScore, depth, flag});
 
     return bestScore;

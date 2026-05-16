@@ -122,9 +122,7 @@ bool Game::move(Coord from, Coord to)
         if ((movingPiece.c == Color::WHITE && to.row == 0) ||
             (movingPiece.c == Color::BLACK && to.row == 7))
         {
-            Piece promoted = movingPiece;
-            promoted.t = PieceType::QUEEN;
-            board.setPiece(to, promoted);
+            movingPiece.t = PieceType::QUEEN;
             lastCheapSnap.lastMove.type = MoveType::PROMOTION;
         }
     }
