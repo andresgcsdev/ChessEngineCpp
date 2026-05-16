@@ -45,7 +45,7 @@ std::array<Coord, 2> Engine::getBestMove(Game game, const Color &selfColor, int 
             {fromMax, toMax};
 }
 
-int Engine::minimax(Game &game, int depth, int alpha, int beta, const Color &selfColor)
+int Engine::minimax(Game &game, const int depth, int alpha, int beta, const Color &selfColor)
 {
     if (!game.hasMoves(game.getTurn()))
     {
@@ -54,7 +54,7 @@ int Engine::minimax(Game &game, int depth, int alpha, int beta, const Color &sel
             // Checkmate
             // Always avoids getting checkmated, always goes for checkmate on the enemy.
             const int mateValue = Eval::MATE_VAL - depth;
-            return game.getTurn() == selfColor ? -mateValue : mateValue;
+            return game.getTurn() == selfColor ? mateValue : -mateValue;
         }
         // Stalemate
         // Always discourage Stalemate, but will go for it if it's the only option
@@ -89,18 +89,23 @@ int Engine::minimax(Game &game, int depth, int alpha, int beta, const Color &sel
 
         if (const auto entry = probeTT(childHash, depth - 1))
         {
-            if (entry->flag == TTEntry::EXACT || entry->flag == TTEntry::ALPHA && entry->score <= alpha)
+            if (entry->flag == TTEntry::EXACT)
             {
                 score = entry->score;
                 usedTT = true;
             }
+            else if (entry->flag == TTEntry::ALPHA && entry->score <= alpha)
+            {
+                // Child will fail‑low – cannot improve our position. Skip it.
+                game.revertState(snap);
+                continue;
+            }
             else if (entry->flag == TTEntry::BETA && entry->score >= beta)
             {
-                score = beta;
-                usedTT = true;
+                // Child causes a beta cutoff
                 game.revertState(snap);
                 bestScore = beta;
-                break; // cutoff
+                break;
             }
         }
 
@@ -182,13 +187,14 @@ void Engine::storeTT(const TTEntry &entry)
     existing = entry; // replace otherwise
 }
 
-std::optional<TTEntry> Engine::probeTT(const uint64_t hash, const int depth)
-{
+std::optional<TTEntry> Engine::probeTT(const uint64_t hash, const int depth) {
     const size_t index = hash & (TT_SIZE - 1);
     const TTEntry &entry = TranspositionTable[index];
-    if (entry.hash == hash && entry.depth >= depth)
-    {
+    if (entry.hash == hash && entry.depth >= depth) {
+        // Ignore mate scores – they are not reliable without depth adjustment
+        if (std::abs(entry.score) > Eval::MATE_VAL - 100)
+            return std::nullopt;
         return entry;
     }
-    return std::nullopt; // no usable entry
+    return std::nullopt;
 }
