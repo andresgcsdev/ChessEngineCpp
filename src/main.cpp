@@ -14,11 +14,11 @@ int main()
     Game g;
     ChessUI ui;
 
-    ui.println("What depth will the Engine go to? (from 0 to 5)");
+    ui.println("What depth will the Engine go to? (from 1 to 6)");
     std::string strdepth = ui.getInput();
     while (strdepth[0] < '0' || strdepth[0] > '5')
         strdepth = ui.getInput();
-    const int depth = strdepth[0] - '0';
+    const int depth = strdepth[0] - '1';
 
     ui.println("Welcome! Which color will you play as? (w for White and b for Black)");
     std::string color = ui.getInput();
