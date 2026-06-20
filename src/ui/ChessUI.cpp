@@ -4,7 +4,7 @@
 #include "ChessUI.hpp"
 #include "../board/Board.hpp"
 
-void ChessUI::printBoard(const Board &b, Color orientation) const
+void ChessUI::printBoard(const Board &b, const Color orientation)
 {
     for (int i = 0; i < 8; i++)
     {
@@ -34,7 +34,7 @@ void ChessUI::printBoard(const Board &b, Color orientation) const
     std::cout << std::endl;
 }
 
-std::string ChessUI::getInput() const
+std::string ChessUI::getInput()
 {
     std::string input;
     do
@@ -45,7 +45,7 @@ std::string ChessUI::getInput() const
     return input;
 }
 
-Piece ChessUI::translatePiece(std::string p) const
+Piece ChessUI::translatePiece(const std::string &p)
 {
     const Piece error = Piece{PieceType::ERROR};
     if (p.length() != 3)
@@ -104,7 +104,7 @@ Piece ChessUI::translatePiece(std::string p) const
     return piece;
 }
 
-Coord ChessUI::translateCoordinates(std::string coord) const
+Coord ChessUI::translateCoordinates(const std::string &coord)
 {
     Coord error = {8, 8};
     if (coord.length() != 2)
@@ -121,12 +121,12 @@ Coord ChessUI::translateCoordinates(std::string coord) const
     return Coord{row, col};
 }
 
-void ChessUI::println(std::string s) const
+void ChessUI::println(const std::string &s)
 {
     std::cout << s << std::endl;
 }
 
-std::string ChessUI::convertCoordToText(Coord c) const
+std::string ChessUI::convertCoordToText(const Coord c)
 {
     std::string coordText;
     if (isValidCoord(c))
@@ -141,7 +141,7 @@ std::string ChessUI::convertCoordToText(Coord c) const
     return coordText;
 }
 
-std::string ChessUI::convertPieceToText(const Piece p) const
+std::string ChessUI::convertPieceToText(const Piece p)
 {
     std::string piecePrint;
 
@@ -201,7 +201,7 @@ std::string ChessUI::convertPieceToText(const Piece p) const
     return piecePrint;
 }
 
-void ChessUI::printMoves(const std::array<Coord, 27> &posb) const
+void ChessUI::printMoves(const std::array<Coord, 27> &posb)
 {
     std::cout << "Possible moves: ";
     for (int i = 0; i < 27; i++)
@@ -219,7 +219,7 @@ void ChessUI::printMoves(const std::array<Coord, 27> &posb) const
     }
 }
 
-void ChessUI::printMovePiece(const Board &b, Coord from, Coord to) const
+void ChessUI::printMovePiece(const Board &b, const Coord from, const Coord to)
 {
     const std::string piecePrint = convertPieceToText(b.getPiece(from));
     const std::string fromStr = convertCoordToText(from);

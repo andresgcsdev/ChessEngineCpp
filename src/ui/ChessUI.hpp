@@ -11,33 +11,33 @@ class ChessUI
 {
 public:
     // Prints the board based on the color orientation.
-    void printBoard(const Board &b, Color orientation) const;
+    static void printBoard(const Board &b, Color orientation);
 
     // Wrapper for a getline().
-    std::string getInput() const;
+    static std::string getInput();
 
     // Matches the input text to a possible piece.
     // Returns a Piece with a PieceType::ERROR if no matches are possible.
-    Piece translatePiece(std::string p) const;
+    static Piece translatePiece(const std::string &p);
 
     // Matches the input text to a possible coordinate on the board.
     // Returns an Out-of-Bounds `Coord {8, 8}` if no matches are possible.
-    Coord translateCoordinates(std::string coord) const;
+    static Coord translateCoordinates(const std::string &coord);
 
     // Wrapper for a simple cout statement with an endl.
-    void println(std::string s) const;
+    static void println(const std::string &s);
 
     // Prints all possible moves inside a Coord[27] array.
-    void printMoves(const std::array<Coord, 27> &posb) const;
+    static void printMoves(const std::array<Coord, 27> &posb);
 
     // Converts a coordinate into algebraic chess form.
     // Returns "ER" if the given coordinates are invalid.
-    std::string convertCoordToText(Coord c) const;
+    static std::string convertCoordToText(Coord c);
 
     // Converts a piece into text form.
     // Returns "ERR" if the given piece is invalid.
-    std::string convertPieceToText(Piece p) const;
+    static std::string convertPieceToText(Piece p);
 
     // Prints the move that will be done with the piece moved.
-    void printMovePiece(const Board &b, Coord from, Coord to) const;
+    static void printMovePiece(const Board &b, Coord from, Coord to);
 };
