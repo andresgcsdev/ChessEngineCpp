@@ -239,6 +239,10 @@ int Eval::evaluate(Game &game, const Color &selfColor)
         }
     }
 
+    Color oppositeColor = selfColor == Color::WHITE ? Color::BLACK : Color::WHITE;
+    if (game.isKingInCheck(oppositeColor))
+        score += CHECK_VAL;
+
     return score;
 }
 
