@@ -7,7 +7,6 @@
 
 // Code by André Santos
 // Main game instance holds a history stack, accessible through g.getHistory().
-// Ui does not give option to change colors, but it's fairly easy to do so by altering the code. Check line 23.
 
 int main()
 {
