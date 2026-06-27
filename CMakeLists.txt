@@ -36,3 +36,4 @@ add_executable(chess_test
         src/fingerprint/Zobrist.cpp
 )
 target_include_directories(chess_test PRIVATE src)
+target_link_options(chess_test PRIVATE -static)
