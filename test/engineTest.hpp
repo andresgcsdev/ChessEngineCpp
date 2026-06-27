@@ -20,7 +20,8 @@ int runEngineTests()
     testSnap.blackKing = defaultBlackKing;
     testSnap.whiteKing = defaultWhiteKing;
     g.revertState(testSnap);
-    std::array<Coord, 2> testEngine = Engine::getBestMove(g, Color::WHITE, 3);
+    std::array<Coord, 2> testEngine;
+    testEngine = Engine::getBestMove(g, Color::WHITE, 3);
     if (g.makeMove(testEngine[0], testEngine[1]))
     {
         std::cout << "        SUCCESS on case 1." << std::endl;
@@ -46,7 +47,7 @@ int runEngineTests()
     testSnap.blackKing = {0, 1};
     testSnap.whiteKing = {2, 1};
     g.revertState(testSnap);
-    testEngine = Engine::getBestMove(g, Color::WHITE, 1);
+    testEngine = Engine::getBestMove(g, Color::WHITE, 3);
     constexpr Coord queen = {7, 3};
     constexpr Coord queenMate = {0, 3};
     if (testEngine[0] == queen && testEngine[1] == queenMate)
@@ -63,7 +64,7 @@ int runEngineTests()
     testSnap.blackKing = {2, 1};
     testSnap.whiteKing = {0, 1};
     g.revertState(testSnap);
-    testEngine = Engine::getBestMove(g, Color::BLACK, 1);
+    testEngine = Engine::getBestMove(g, Color::BLACK, 3);
     if (testEngine[0] == queen && testEngine[1] == queenMate)
     {
         std::cout << "        SUCCESS on case 2." << std::endl;
@@ -79,7 +80,7 @@ int runEngineTests()
     testSnap.whiteKing = {7, 3};
     testSnap.state.turn = Color::WHITE;
     g.revertState(testSnap);
-    testEngine = Engine::getBestMove(g, Color::WHITE, 1);
+    testEngine = Engine::getBestMove(g, Color::WHITE, 3);
     constexpr Coord rook = {7, 7};
     constexpr Coord rookMate = {0, 7};
     if (testEngine[0] == rook && testEngine[1] == rookMate)
@@ -96,7 +97,7 @@ int runEngineTests()
     testSnap.whiteKing = {7, 3};
     testSnap.state.turn = Color::WHITE;
     g.revertState(testSnap);
-    testEngine = Engine::getBestMove(g, Color::WHITE, 1);
+    testEngine = Engine::getBestMove(g, Color::WHITE, 3);
     constexpr Coord knight = {2, 4};
     constexpr Coord knightMate = {1, 2};
     if (testEngine[0] == knight && testEngine[1] == knightMate)
