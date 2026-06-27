@@ -53,7 +53,7 @@ int Engine::minimax(Game &game, const int depth, int alpha, int beta, const Colo
         {
             // Checkmate
             // Always avoids getting checkmated, always goes for checkmate on the enemy.
-            const int mateValue = Eval::MATE_VAL - depth;
+            const int mateValue = Eval::MATE_VAL + depth; // Shallower depth checkmates are favored against 
             return game.getTurn() == selfColor ? -mateValue : mateValue;
         }
         // Stalemate
