@@ -11,22 +11,20 @@
 int main()
 {
     Game g;
-    ChessUI ui;
 
-    ui.println("What depth will the Engine go to? (from 1 to 6)");
-    std::string strdepth = ui.getInput();
-    while (strdepth[0] < '0' || strdepth[0] > '5')
-        strdepth = ui.getInput();
+    ChessUI::println("What depth will the Engine go to? (from 1 to 6)");
+    std::string strdepth = ChessUI::getInput();
+    while (strdepth[0] < '1' || strdepth[0] > '6')
+        strdepth = ChessUI::getInput();
     const int depth = strdepth[0] - '1';
 
-    ui.println("Welcome! Which color will you play as? (w for White and b for Black)");
-    std::string color = ui.getInput();
+    ChessUI::println("Welcome! Which color will you play as? (w for White and b for Black)");
+    std::string color = ChessUI::getInput();
     while (color[0] != 'w' && color[0] != 'b')
-        color = ui.getInput();
+        color = ChessUI::getInput();
 
     Color playerColor = color[0] == 'w'? Color::WHITE : Color::BLACK;
 
-    Engine engine;
     bool running = true;
     while (running)
     {
@@ -36,14 +34,14 @@ int main()
             // Change this color value to WHITE to play as black.
             if (g.getTurn() != playerColor)
             {
-                std::array<Coord, 2> bestMove = engine.getBestMove(g, playerColor == Color::WHITE ? Color::BLACK : Color::WHITE, depth);
-                ui.printMovePiece(g.getBoard(), bestMove[0], bestMove[1]);
+                std::array<Coord, 2> bestMove = Engine::getBestMove(g, playerColor == Color::WHITE ? Color::BLACK : Color::WHITE, depth);
+                ChessUI::printMovePiece(g.getBoard(), bestMove[0], bestMove[1]);
                 g.makeMove(bestMove[0], bestMove[1]);
             }
             else
             {
-                ui.printBoard(g.getBoard(), g.getTurn());
-                ui.println("What piece do you want to move?");
+                ChessUI::printBoard(g.getBoard(), g.getTurn());
+                ChessUI::println("What piece do you want to move?");
                 std::string input;
                 Coord pieceCoord = {8, 8};
                 // Array of possible moves
@@ -51,8 +49,8 @@ int main()
                 // Making sure the user inputs a valid piece that is on the board.
                 do
                 {
-                    input = ui.getInput();
-                    Piece piece = ui.translatePiece(input);
+                    input = ChessUI::getInput();
+                    Piece piece = ChessUI::translatePiece(input);
                     if (piece.t != PieceType::ERROR)
                     {
                         pieceCoord = g.getBoard().getCoordinates(piece);
@@ -62,17 +60,17 @@ int main()
                     }
                 } while (!isValidCoord(posb[0]));
 
-                ui.println("Where do you want to move it to? (type 'undo' to go to previous step)");
-                ui.printMoves(posb);
+                ChessUI::println("Where do you want to move it to? (type 'undo' to go to previous step)");
+                ChessUI::printMoves(posb);
                 Coord to;
                 bool isPossible = false;
                 // Validating user coordinate input. Must be a valid coordinate and be in the possible moves array.
                 do
                 {
-                    input = ui.getInput();
+                    input = ChessUI::getInput();
                     if (input == "undo")
                         break;
-                    to = ui.translateCoordinates(input);
+                    to = ChessUI::translateCoordinates(input);
                     if (!isValidCoord(to))
                         continue;
                     for (int i = 0; i < 27; i++)
@@ -95,22 +93,22 @@ int main()
         // Found checkmate or stalemate.
         else
         {
-            ui.printBoard(g.getBoard(), g.getTurn());
+            ChessUI::printBoard(g.getBoard(), g.getTurn());
             // Looking if in check.
             if (g.isKingInCheck(g.getTurn()))
             {
                 std::string pieceWin = g.getTurn() == Color::WHITE ? "Black" : "White";
                 std::string winningText = "The " + pieceWin + " pieces have won by checkmate!";
-                ui.println(winningText);
+                ChessUI::println(winningText);
                 running = false;
             }
             else
             {
-                ui.println("Draw by stalemate!");
+                ChessUI::println("Draw by stalemate!");
                 running = false;
             }
         }
     }
-    ui.println("Press any key to end...");
-    ui.getInput();
+    ChessUI::println("Press any key to end...");
+    ChessUI::getInput();
 }
