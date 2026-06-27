@@ -74,7 +74,7 @@ int runEngineTests()
         ERROR_COUNT++;
     }
 
-    // Mate with rook.
+    // Checkmate with rook.
     testSnap.board = FEN_to_matrix("1k6/ppp5/8/8/8/8/8/3K3R");
     testSnap.blackKing = {0, 1};
     testSnap.whiteKing = {7, 3};
@@ -92,6 +92,7 @@ int runEngineTests()
         ERROR_COUNT++;
     }
 
+    // Checkmate with knight.
     testSnap.board = FEN_to_matrix("kr6/pp6/4N3/8/8/8/8/3K4");
     testSnap.blackKing = {0, 0};
     testSnap.whiteKing = {7, 3};
