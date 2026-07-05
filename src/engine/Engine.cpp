@@ -53,11 +53,11 @@ int Engine::minimax(Game &game, const int depth, int alpha, int beta, const Colo
         {
             // Checkmate
             // Always avoids getting checkmated, always goes for checkmate on the enemy.
-            const int mateValue = Eval::MATE_VAL + depth; // Shallower depth checkmates are favored against 
+            const int mateValue = Eval::MATE_VAL + depth; // Faster checkmates (higher remaining depth) yield a higher score than slower ones.
             return game.getTurn() == selfColor ? -mateValue : mateValue;
         }
-        // Stalemate
-        // Always discourage Stalemate, but will go for it if it's the only option
+        // Stalemate.
+        // Return -50 (Contempt Factor) to actively discourage draws unless completely losing.
         return -50;
     }
 
@@ -70,7 +70,13 @@ int Engine::minimax(Game &game, const int depth, int alpha, int beta, const Colo
     if (const auto entry = probeTT(nodeHash, depth))
     {
         if (entry->flag == TTEntry::EXACT) return entry->score;
+
+        // TTEntry::ALPHA means the stored score is an Upper Bound (node failed low).
+        // If this upper bound is <= our current alpha, this branch cannot improve our score.
         if (entry->flag == TTEntry::ALPHA && entry->score <= alpha) return alpha;
+
+        // TTEntry::BETA means the stored score is a Lower Bound (node failed high).
+        // If this lower bound is >= our current beta, this branch will cause a beta cutoff.
         if (entry->flag == TTEntry::BETA && entry->score >= beta) return beta;
     }
 
@@ -82,35 +88,8 @@ int Engine::minimax(Game &game, const int depth, int alpha, int beta, const Colo
     {
         game.applyMove(m.from, m.to);
         CheapSnap snap = game.getCheapSnap();
-        const uint64_t childHash = game.getCurrentState().hash;
 
-        int score;
-        bool usedTT = false;
-
-        if (const auto entry = probeTT(childHash, depth - 1))
-        {
-            if (entry->flag == TTEntry::EXACT)
-            {
-                score = entry->score;
-                usedTT = true;
-            }
-            else if (entry->flag == TTEntry::ALPHA && entry->score <= alpha)
-            {
-                // Child will fail‑low – cannot improve our position. Skip it.
-                game.revertState(snap);
-                continue;
-            }
-            else if (entry->flag == TTEntry::BETA && entry->score >= beta)
-            {
-                // Child causes a beta cutoff
-                game.revertState(snap);
-                bestScore = beta;
-                break;
-            }
-        }
-
-        if (!usedTT)
-            score = minimax(game, depth - 1, alpha, beta, selfColor);
+        int score = minimax(game, depth - 1, alpha, beta, selfColor);
 
         game.revertState(snap);
 
@@ -125,6 +104,11 @@ int Engine::minimax(Game &game, const int depth, int alpha, int beta, const Colo
             beta = std::min(beta, bestScore);
         }
         if (beta <= alpha) break;
+        // alpha = best score the maximizer can already force somewhere else in the tree.
+        // beta  = best score the minimizer can already force somewhere else in the tree.
+        // Once beta <= alpha, the side NOT moving at this node already has a better
+        // alternative elsewhere than what's still on the table here, so they'd never
+        // let the game reach this position in the first place. No point evaluating further.
     }
 
     // Store the result for this node

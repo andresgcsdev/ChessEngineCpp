@@ -219,9 +219,9 @@ void ChessUI::printMoves(const std::array<Coord, 27> &posb)
     }
 }
 
-void ChessUI::printMovePiece(const Board &b, const Coord from, const Coord to)
+void ChessUI::printMovePiece(const Piece p, const Coord from, const Coord to)
 {
-    const std::string piecePrint = convertPieceToText(b.getPiece(from));
+    const std::string piecePrint = convertPieceToText(p);
     const std::string fromStr = convertCoordToText(from);
     const std::string toStr = convertCoordToText(to);
     std::cout << piecePrint << " at " << fromStr << " to " << toStr << std::endl;

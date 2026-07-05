@@ -38,6 +38,6 @@ public:
     // Returns "ERR" if the given piece is invalid.
     static std::string convertPieceToText(Piece p);
 
-    // Prints the move that will be done with the piece moved.
-    static void printMovePiece(const Board &b, Coord from, Coord to);
+    // Prints the given piece movement.
+    static void printMovePiece(Piece p, Coord from, Coord to);
 };

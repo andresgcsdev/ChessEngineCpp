@@ -31,16 +31,19 @@ int main()
         // Looking for checkmate or stalemate.
         if (g.hasMoves(g.getTurn()) && !g.staleMateByMaterial())
         {
-            // Change this color value to WHITE to play as black.
+            // No checkmate or stalemate found.
             if (g.getTurn() != playerColor)
             {
+                // AI turn.
                 std::array<Coord, 2> bestMove = Engine::getBestMove(g, playerColor == Color::WHITE ? Color::BLACK : Color::WHITE, depth);
-                ChessUI::printMovePiece(g.getBoard(), bestMove[0], bestMove[1]);
+                ChessUI::printMovePiece(g.getBoard().getPiece(bestMove[0]), bestMove[0], bestMove[1]);
                 g.makeMove(bestMove[0], bestMove[1]);
             }
             else
             {
+                // Player turn.
                 ChessUI::printBoard(g.getBoard(), g.getTurn());
+                // Piece selection.
                 ChessUI::println("What piece do you want to move?");
                 std::string input;
                 Coord pieceCoord = {8, 8};
@@ -60,11 +63,12 @@ int main()
                     }
                 } while (!isValidCoord(posb[0]));
 
+                // Move selection.
                 ChessUI::println("Where do you want to move it to? (type 'undo' to go to previous step)");
                 ChessUI::printMoves(posb);
-                Coord to;
+                Coord to = {8, 8};
                 bool isPossible = false;
-                // Validating user coordinate input. Must be a valid coordinate and be in the possible moves array.
+                // Validating user input, must be a valid coordinate and be in the possible moves array.
                 do
                 {
                     input = ChessUI::getInput();
@@ -85,7 +89,7 @@ int main()
                         }
                     }
                 } while (!isPossible);
-                // Though makeMove returns true or false depending on if the move was possible to be done, but doing a check
+                // MakeMove() returns true or false depending on if the move was possible to be done, but doing a check
                 // here is redundant due to previous input validations.
                 g.makeMove(pieceCoord, to);
             }
