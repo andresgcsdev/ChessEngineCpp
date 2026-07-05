@@ -13,7 +13,7 @@ A C++ chess engine with a full game implementation and an AI opponent powered by
 - **Position Hashing:** Zobrist hashing with incremental updates (64‑bit keys)
 - **Game State Management:** Full move history with undo/revert functionality
 - **Clean Architecture:** Separation of concerns into `board`, `engine`, `fingerprint`, `game`, `movegen`, `types` and `ui`
-- **Testing:** 180 unit tests, all passing (FEN‑based validation)
+- **Testing:** 187 unit tests, all passing (FEN‑based validation)
 ---
 
 ## Building
@@ -60,7 +60,7 @@ Comprehensive unit test suite covering:
 - **UI**: Text-to-piece, text-to-coordinate, and piece-to-text transformations
 - **Board**: Initialization, matrix operations, piece lookup, move execution
 - **Game**: Move validation, check/checkmate detection, castling, en passant
-- **Engine**: Move validation for both colors
+- **Engine**: Move validation for both colors, checkmate search validation
 
 ### Run Tests
 
@@ -127,7 +127,7 @@ cmake --build build --target chess_test
 
 **Delta‑State Revert (CheapSnap):** Instead of copying the full 8×8 board at every search node, only the minimal move delta + pre‑move game state is stored. Reverting a move touches at most 4 squares – constant‑time undo. CheapSnap is 12.5× smaller than a full SnapShot, removing memory traffic as a bottleneck.
 
-**Transposition Table (TT):** Positions are hashed with Zobrist (64‑bit). The table stores depth, score, and bound type. At the start of a search node we probe the TT – if the stored depth is sufficient and the bound allows an early cutoff, we return immediately. This prevents re‑searching identical positions reached through different move orders. The TT is a static 12 MB array (data segment, not stack) to avoid overflow.
+**Transposition Table (TT):** Positions are hashed with Zobrist (64‑bit). The table stores depth, score, and bound type. At the start of a search node we probe the TT – if the stored depth is sufficient and the bound allows an early cutoff, we return immediately. This prevents re‑searching identical positions reached through different move orders. The TT is a static 12MB array (data segment, not stack) to avoid overflow.
 
 **Zobrist Hashing – Incremental Updates:** The game state hash is updated during move execution by XOR‑ing out the old piece key at `from`, XOR‑ing in the new piece key at `to`, and toggling side‑to‑move, en passant file, and castling rights as needed. No recomputation from scratch. The hash in CheapSnap is restored automatically on revert.
 
@@ -141,9 +141,9 @@ cmake --build build --target chess_test
 
 This is my fifth chess implementation, and the first one I'm fully satisfied with architecturally.
 
-It started in 2022 with a ~3000 line implementation in VisuAlg (a Portuguese pseudocode language) during the first year of technical school — built purely because the coursework got too easy. That version is lost.
+It started in 2022 with a ~3000 line implementation in VisuAlg (a Portuguese pseudocode language) during the first year of technical school, built purely because the coursework got too easy. That version is lost.
 
-From there came a JavaScript web implementation during the second year, featuring a partially functional AI called PeacockBass — the name is a joke one related to stockfish, I found the portuguese name funny at the time. It was abandoned due to JavaScript's performance limits and a bug in the capture evaluation that took too long to track down. The code is still on GitHub if you're curious.
+From there came a JavaScript web implementation during the second year, featuring a partially functional AI called PeacockBass, the name is a joke one related to stockfish, I found the portuguese name funny at the time. It was abandoned due to JavaScript's performance limits and a bug in the capture evaluation that took too long to track down. The code is still on GitHub if you're curious.
 
 Then a first C++ version, functional but without proper architecture. Then implementations in Java, Rust, and others — each one using chess as a benchmark for learning a new language. The same problem, different constraints, different lessons each time.
 
@@ -187,7 +187,7 @@ Position evaluation = material value + positional bonuses from piece-square tabl
 
 I'm André, a Computer Science student at UFLA (Universidade Federal de Lavras), with a technical degree in Systems Development from CEFET-MG Timóteo.
 
-I tend to learn by building things that genuinely interest me rather than following curricula. Chess has been a recurring benchmark throughout that process — something complex enough to teach you a lot about a language, familiar enough that the logic never gets in the way of the learning.
+I tend to learn by building things that genuinely interest me rather than following curricula. Chess has been a recurring benchmark throughout that process, something complex enough to teach you a lot about a language, familiar enough that the logic never gets in the way of the learning.
 
 Most of what I know I taught myself out of curiosity: multiple programming languages, chess engines, procedural dungeon generators, PDF parsers, web scrapers. I'm most comfortable in C++, Python and Java, and most interested in algorithm design and software architecture.
 
